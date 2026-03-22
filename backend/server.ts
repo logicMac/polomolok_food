@@ -160,13 +160,24 @@ app.use('/api/users', userRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/riders', riderRoutes);
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found'
+// Serve static files from React app in production
+if (process.env.NODE_ENV === 'production') {
+  const clientBuildPath = path.join(process.cwd(), '..', 'client', 'dist');
+  app.use(express.static(clientBuildPath));
+  
+  // Handle React routing - return all requests to React app
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
   });
-});
+} else {
+  // 404 handler for development
+  app.use((req, res) => {
+    res.status(404).json({
+      success: false,
+      message: 'Route not found'
+    });
+  });
+}
 
 // Global error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

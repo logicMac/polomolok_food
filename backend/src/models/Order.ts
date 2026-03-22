@@ -9,6 +9,10 @@ const orderSchema = new Schema<IOrderDocument>({
     required: [true, 'User ID is required'],
     ref: 'User'
   },
+  riderId: {
+    type: String,
+    ref: 'User'
+  },
   items: [{
     foodId: {
       type: String,
@@ -37,7 +41,7 @@ const orderSchema = new Schema<IOrderDocument>({
   },
   status: {
     type: String,
-    enum: ['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled'],
+    enum: ['pending', 'confirmed', 'preparing', 'ready', 'out-for-delivery', 'delivered', 'cancelled'],
     default: 'pending'
   },
   deliveryAddress: {
@@ -60,6 +64,31 @@ const orderSchema = new Schema<IOrderDocument>({
       required: false
     }
   },
+  estimatedDeliveryTime: {
+    type: Date
+  },
+  driverLocation: {
+    latitude: {
+      type: Number
+    },
+    longitude: {
+      type: Number
+    },
+    lastUpdated: {
+      type: Date
+    }
+  },
+  statusHistory: [{
+    status: {
+      type: String,
+      required: true
+    },
+    timestamp: {
+      type: Date,
+      default: Date.now
+    },
+    note: String
+  }],
   createdAt: {
     type: Date,
     default: Date.now

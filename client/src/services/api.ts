@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
 
-const API_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:5000/api';
+const API_URL = ((import.meta as any).env.VITE_API_URL as string) || 'http://localhost:5000/api';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -34,6 +34,11 @@ api.interceptors.request.use(
       config.headers['X-CSRF-Token'] = csrfToken;
     }
     
+    // If data is FormData, remove Content-Type header to let browser set it with boundary
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
+    
     return config;
   },
   (error) => Promise.reject(error)
@@ -46,7 +51,7 @@ api.interceptors.response.use(
     const originalRequest: any = error.config;
 
     // Handle CSRF token errors
-    if (error.response?.status === 403 && error.response?.data?.message?.includes('CSRF')) {
+    if (error.response?.status === 403 && (error.response?.data as any)?.message?.includes('CSRF')) {
       // Refresh CSRF token and retry
       await initializeCsrf();
       if (csrfToken && originalRequest) {
@@ -55,8 +60,13 @@ api.interceptors.response.use(
       }
     }
 
-    // Handle token expiration - refresh token automatically
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Don't try to refresh token for auth endpoints (login, register, verify-otp)
+    const isAuthEndpoint = originalRequest?.url?.includes('/auth/login') || 
+                          originalRequest?.url?.includes('/auth/register') ||
+                          originalRequest?.url?.includes('/auth/verify-otp');
+
+    // Handle token expiration - refresh token automatically (but not for auth endpoints)
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
       try {

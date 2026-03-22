@@ -5,7 +5,7 @@ import { ShoppingCart, User, LogOut, LayoutDashboard, UtensilsCrossed, Menu, X }
 import { useState } from 'react';
 
 const Navbar = () => {
-  const { isAuthenticated, isAdmin, user, logout } = useAuth();
+  const { isAuthenticated, isAdmin, isRider, user, logout } = useAuth();
   const { totalItems } = useCart();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -35,6 +35,14 @@ const Navbar = () => {
                   >
                     <LayoutDashboard className="w-4 h-4" />
                     <span>Dashboard</span>
+                  </Link>
+                ) : isRider ? (
+                  <Link
+                    to="/rider"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-300 hover:bg-zinc-900 hover:text-white transition"
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    <span>My Deliveries</span>
                   </Link>
                 ) : (
                   <>
@@ -112,6 +120,14 @@ const Navbar = () => {
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Dashboard
+                  </Link>
+                ) : isRider ? (
+                  <Link
+                    to="/rider"
+                    className="block px-4 py-2 text-gray-300 hover:bg-zinc-900 hover:text-white rounded-lg"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    My Deliveries
                   </Link>
                 ) : (
                   <>

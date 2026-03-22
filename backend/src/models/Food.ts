@@ -23,10 +23,28 @@ const foodSchema = new Schema<IFoodDocument>({
     trim: true,
     enum: ['Appetizer', 'Main Course', 'Dessert', 'Beverage', 'Snack']
   },
+  cuisine: {
+    type: String,
+    trim: true,
+    default: 'Filipino'
+  },
+  dietaryTags: [{
+    type: String,
+    enum: ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'halal', 'spicy']
+  }],
+  ingredients: [{
+    type: String,
+    trim: true
+  }],
   price: {
     type: Number,
     required: [true, 'Price is required'],
     min: [0, 'Price cannot be negative']
+  },
+  preparationTime: {
+    type: Number,
+    default: 30,
+    min: [0, 'Preparation time cannot be negative']
   },
   image: {
     type: String,

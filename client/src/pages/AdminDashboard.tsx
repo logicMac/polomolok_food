@@ -110,6 +110,14 @@ const AdminDashboard = () => {
             <h2 className="text-xl font-bold mb-2 text-white group-hover:text-gray-200">Manage Users</h2>
             <p className="text-gray-400">View and manage user accounts</p>
           </Link>
+
+          <Link
+            to="/admin/riders"
+            className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 hover:border-zinc-700 transition group"
+          >
+            <h2 className="text-xl font-bold mb-2 text-white group-hover:text-gray-200">Manage Riders</h2>
+            <p className="text-gray-400">Add and manage delivery riders</p>
+          </Link>
         </div>
       </div>
     </div>

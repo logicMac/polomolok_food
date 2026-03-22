@@ -2,6 +2,7 @@ import { Response } from 'express';
 import Order from '../models/Order';
 import Food from '../models/Food';
 import { AuthRequest } from '../types';
+import { emitOrderUpdate } from '../config/socket';
 
 export const createOrder = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -195,11 +196,11 @@ export const getAllOrders = async (req: AuthRequest, res: Response): Promise<voi
 
 export const updateOrderStatus = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const orderId = req.params.id as string;
     const { status } = req.body;
 
     const order = await Order.findByIdAndUpdate(
-      id,
+      orderId,
       { status },
       { new: true, runValidators: true }
     );
@@ -211,6 +212,9 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response): Promis
       });
       return;
     }
+
+    // Emit real-time update
+    emitOrderUpdate(orderId, order);
 
     res.status(200).json({
       success: true,
@@ -271,6 +275,115 @@ export const cancelOrder = async (req: AuthRequest, res: Response): Promise<void
     res.status(500).json({
       success: false,
       message: 'Failed to cancel order',
+      error: error.message
+    });
+  }
+};
+
+export const updateOrderTracking = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const orderId = req.params.id as string;
+    const { status, driverLocation, estimatedDeliveryTime, note } = req.body;
+
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+      return;
+    }
+
+    // Update status if provided
+    if (status) {
+      order.status = status;
+      
+      // Add to status history
+      if (!order.statusHistory) {
+        order.statusHistory = [];
+      }
+      order.statusHistory.push({
+        status,
+        timestamp: new Date(),
+        note: note || undefined
+      });
+    }
+
+    // Update driver location if provided
+    if (driverLocation && driverLocation.latitude && driverLocation.longitude) {
+      order.driverLocation = {
+        latitude: driverLocation.latitude,
+        longitude: driverLocation.longitude,
+        lastUpdated: new Date()
+      };
+    }
+
+    // Update estimated delivery time if provided
+    if (estimatedDeliveryTime) {
+      order.estimatedDeliveryTime = new Date(estimatedDeliveryTime);
+    }
+
+    await order.save();
+
+    // Emit real-time update
+    emitOrderUpdate(orderId, order);
+
+    res.status(200).json({
+      success: true,
+      message: 'Order tracking updated successfully',
+      data: order
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update order tracking',
+      error: error.message
+    });
+  }
+};
+
+export const getOrderTracking = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.userId;
+    const userRole = req.user?.role;
+
+    const order = await Order.findById(id);
+
+    if (!order) {
+      res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+      return;
+    }
+
+    // Check authorization
+    if (userRole !== 'admin' && order.userId !== userId) {
+      res.status(403).json({
+        success: false,
+        message: 'Access denied'
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        orderId: order._id,
+        status: order.status,
+        statusHistory: order.statusHistory || [],
+        driverLocation: order.driverLocation,
+        estimatedDeliveryTime: order.estimatedDeliveryTime,
+        deliveryAddress: order.deliveryAddress,
+        location: order.location
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch order tracking',
       error: error.message
     });
   }

@@ -11,6 +11,7 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isRider: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -43,12 +44,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     try {
       const response = await api.post('/auth/login', { email, password });
+      console.log('Login API response:', response.data); // Debug
       return { 
         success: true, 
         message: response.data.message,
         otpSent: response.data.data.otpSent 
       };
     } catch (error: any) {
+      console.log('Login API error:', error.response?.data); // Debug
       return { 
         success: false, 
         message: error.response?.data?.message || 'Login failed' 
@@ -93,6 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         logout,
         isAuthenticated: !!user,
         isAdmin: user?.role === 'admin',
+        isRider: user?.role === 'rider',
       }}
     >
       {children}

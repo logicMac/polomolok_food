@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Mail, Lock, Shield, ArrowRight, AlertCircle, Clock } from 'lucide-react';
 
@@ -19,25 +19,50 @@ const Login = () => {
   
   const { login, verifyOTP } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check for success message from registration (only once on mount)
+  useEffect(() => {
+    if (location.state?.message) {
+      setMessage(location.state.message);
+      // Clear the message from location state
+      window.history.replaceState({}, document.title);
+    }
+  }, []); // Empty dependency array - only run once
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    setMessage('');
+    // Don't clear error here - let it persist until we have a result
+    // setError('');
+    // setMessage('');
 
-    const result = await login(email, password);
-    
-    if (result.success && result.otpSent) {
-      setShowOTP(true);
-      setMessage(result.message);
-      setLoginAttempts(0); // Reset on success
-    } else {
-      setError(result.message);
+    try {
+      const result = await login(email, password);
+      
+      console.log('Login result:', result); // Debug log
+      
+      if (result.success && result.otpSent) {
+        setShowOTP(true);
+        setMessage(result.message || 'OTP sent to your email');
+        setLoginAttempts(0); // Reset on success
+        setError(''); // Clear error only on success
+      } else {
+        const errorMsg = result.message || 'Login failed. Please try again.';
+        console.log('Setting error:', errorMsg); // Debug log
+        setMessage(''); // Clear message on error
+        setError(errorMsg); // Set error
+        setLoginAttempts(prev => prev + 1);
+      }
+    } catch (err: any) {
+      const errorMsg = err.message || 'An unexpected error occurred. Please try again.';
+      console.log('Caught error:', errorMsg); // Debug log
+      setMessage(''); // Clear message on error
+      setError(errorMsg); // Set error
       setLoginAttempts(prev => prev + 1);
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   const handleVerifyOTP = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -49,28 +74,58 @@ const Login = () => {
     }
     
     setLoading(true);
-    setError('');
+    // Don't clear error here - let it persist until we have a result
+    // setError('');
 
-    const result = await verifyOTP(email, otp);
-    
-    if (result.success) {
-      navigate('/');
-    } else {
-      setError(result.message);
-      setOtpAttempts(prev => prev + 1);
+    try {
+      const result = await verifyOTP(email, otp);
       
-      // Calculate remaining attempts (5 max per 5 minutes)
-      const remaining = 5 - (otpAttempts + 1);
-      setRateLimitRemaining(remaining);
+      console.log('OTP verification result:', result); // Debug log
       
-      // Lock if no attempts remaining
-      if (remaining <= 0) {
-        setIsLocked(true);
-        setLockTimeRemaining(300); // 5 minutes in seconds
+      if (result.success) {
+        setError(''); // Clear error on success
+        setMessage('Login successful! Redirecting...');
+        
+        // Get user from localStorage to check role
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          // Redirect based on role
+          if (user.role === 'admin') {
+            setTimeout(() => navigate('/admin'), 500);
+          } else if (user.role === 'rider') {
+            setTimeout(() => navigate('/rider'), 500);
+          } else {
+            setTimeout(() => navigate('/'), 500);
+          }
+        } else {
+          setTimeout(() => navigate('/'), 500);
+        }
+      } else {
+        setMessage(''); // Clear message on error
+        setError(result.message || 'Invalid OTP. Please try again.');
+        setOtpAttempts(prev => prev + 1);
+        
+        // Calculate remaining attempts (5 max per 5 minutes)
+        const remaining = 5 - (otpAttempts + 1);
+        setRateLimitRemaining(remaining);
+        
+        // Lock if no attempts remaining
+        if (remaining <= 0) {
+          setIsLocked(true);
+          setLockTimeRemaining(300); // 5 minutes in seconds
+        }
+        
+        console.log('OTP error set, staying on OTP screen'); // Debug log
       }
+    } catch (err: any) {
+      setMessage(''); // Clear message on error
+      setError(err.message || 'An unexpected error occurred. Please try again.');
+      setOtpAttempts(prev => prev + 1);
+      console.log('OTP catch error, staying on OTP screen'); // Debug log
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   // Countdown timer for lock
@@ -148,8 +203,23 @@ const Login = () => {
                 </div>
 
                 {error && (
-                  <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 text-sm text-red-400">
-                    {error}
+                  <div key={error} className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 text-sm text-red-400 animate-shake">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-semibold mb-1">Login Failed</p>
+                        <p>{error}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {message && (
+                  <div className="bg-green-500/10 border border-green-500/50 rounded-lg p-4 text-sm text-green-400">
+                    <div className="flex items-start gap-3">
+                      <Shield className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                      <p>{message}</p>
+                    </div>
                   </div>
                 )}
 
@@ -165,7 +235,12 @@ const Login = () => {
                   disabled={loading}
                   className="w-full bg-white text-black font-semibold rounded-lg py-3 hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  {loading ? 'Processing...' : (
+                  {loading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                      Processing...
+                    </>
+                  ) : (
                     <>
                       Sign In
                       <ArrowRight className="h-5 w-5" />
@@ -198,7 +273,7 @@ const Login = () => {
                 </div>
               )}
 
-              <form onSubmit={handleVerifyOTP} className="space-y-5">
+              <form onSubmit={handleVerifyOTP} className="space-y-5" onReset={(e) => e.preventDefault()}>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2 text-center">
                     OTP Code
@@ -212,6 +287,7 @@ const Login = () => {
                     maxLength={6}
                     disabled={isLocked}
                     required
+                    autoComplete="off"
                   />
                   
                   {/* Rate limit indicator */}
@@ -232,17 +308,32 @@ const Login = () => {
                 </div>
 
                 {error && (
-                  <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 text-sm text-red-400">
-                    {error}
+                  <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 text-sm text-red-400 animate-shake">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-semibold mb-1">Verification Failed</p>
+                        <p>{error}</p>
+                      </div>
+                    </div>
                   </div>
                 )}
 
                 <button
                   type="submit"
                   disabled={loading || otp.length !== 6 || isLocked}
-                  className="w-full bg-white text-black font-semibold rounded-lg py-3 hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-white text-black font-semibold rounded-lg py-3 hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  {loading ? 'Verifying...' : isLocked ? 'Account Locked' : 'Verify OTP'}
+                  {loading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                      Verifying...
+                    </>
+                  ) : isLocked ? (
+                    'Account Locked'
+                  ) : (
+                    'Verify OTP'
+                  )}
                 </button>
 
                 <button

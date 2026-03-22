@@ -8,21 +8,29 @@ import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import fs from 'fs';
+import { createServer } from 'http';
 import connectDB from './db';
 import { apiLimiter } from './src/middlewares/rateLimiter';
 import { getCsrfToken, verifyCsrfToken } from './src/middlewares/csrf';
 import logger from './src/config/logger';
+import { initializeSocket } from './src/config/socket';
 
 // Routes
 import authRoutes from './src/routes/authRoutes';
 import foodRoutes from './src/routes/foodRoutes';
 import orderRoutes from './src/routes/orderRoutes';
 import userRoutes from './src/routes/userRoutes';
+import chatRoutes from './src/routes/chatRoutes';
+import riderRoutes from './src/routes/riderRoutes';
 
 dotenv.config();
 
 const app = express();
+const server = createServer(app);
 const PORT = process.env.PORT || 5000;
+
+// Initialize Socket.IO
+initializeSocket(server);
 
 // Connect to MongoDB
 connectDB();
@@ -149,6 +157,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/foods', foodRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/riders', riderRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -182,7 +192,8 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔌 Socket.IO enabled for real-time features`);
 });

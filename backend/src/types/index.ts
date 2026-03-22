@@ -6,7 +6,17 @@ export interface IUser {
   name: string;
   email: string;
   password: string;
-  role: 'admin' | 'customer';
+  role: 'admin' | 'customer' | 'rider';
+  phoneNumber?: string;
+  vehicleType?: 'motorcycle' | 'bicycle' | 'car' | 'scooter';
+  vehicleNumber?: string;
+  isAvailable?: boolean;
+  image?: string;
+  currentLocation?: {
+    latitude: number;
+    longitude: number;
+    lastUpdated: Date;
+  };
   otp?: string;
   otpExpires?: Date;
   loginAttempts: number;
@@ -22,7 +32,11 @@ export interface IFood {
   name: string;
   description: string;
   category: string;
+  cuisine?: string;
+  dietaryTags?: string[];
+  ingredients?: string[];
   price: number;
+  preparationTime?: number;
   image: string;
   available: boolean;
   createdAt: Date;
@@ -31,6 +45,7 @@ export interface IFood {
 export interface IOrder {
   _id: string;
   userId: string;
+  riderId?: string;
   items: Array<{
     foodId: string;
     name: string;
@@ -38,13 +53,24 @@ export interface IOrder {
     quantity: number;
   }>;
   totalPrice: number;
-  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'out-for-delivery' | 'delivered' | 'cancelled';
   deliveryAddress: string;
   phoneNumber: string;
   location?: {
     latitude: number;
     longitude: number;
   };
+  estimatedDeliveryTime?: Date;
+  driverLocation?: {
+    latitude: number;
+    longitude: number;
+    lastUpdated: Date;
+  };
+  statusHistory?: Array<{
+    status: string;
+    timestamp: Date;
+    note?: string;
+  }>;
   createdAt: Date;
 }
 

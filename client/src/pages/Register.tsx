@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Lock, ArrowRight } from 'lucide-react';
+import { User, Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
 import ReCAPTCHA from 'react-google-recaptcha';
 
 const Register = () => {
@@ -42,18 +42,24 @@ const Register = () => {
 
     setLoading(true);
 
-    const result = await register(name, email, password, recaptchaToken);
-    
-    if (result.success) {
-      navigate('/login');
-    } else {
-      setError(result.message);
-      // Reset reCAPTCHA on error
+    try {
+      const result = await register(name, email, password, recaptchaToken);
+      
+      if (result.success) {
+        navigate('/login', { state: { message: 'Registration successful! Please login.' } });
+      } else {
+        setError(result.message || 'Registration failed. Please try again.');
+        // Reset reCAPTCHA on error
+        recaptchaRef.current?.reset();
+        setRecaptchaToken(null);
+      }
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred. Please try again.');
       recaptchaRef.current?.reset();
       setRecaptchaToken(null);
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (
@@ -146,8 +152,14 @@ const Register = () => {
             </div>
 
             {error && (
-              <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 text-sm text-red-400">
-                {error}
+              <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 text-sm text-red-400 animate-shake">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold mb-1">Registration Failed</p>
+                    <p>{error}</p>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -156,7 +168,7 @@ const Register = () => {
               <div className="flex justify-center">
                 <ReCAPTCHA
                   ref={recaptchaRef}
-                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                  sitekey={(import.meta as any).env.VITE_RECAPTCHA_SITE_KEY}
                   onChange={handleRecaptchaChange}
                   theme="dark"
                 />
@@ -165,10 +177,15 @@ const Register = () => {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !recaptchaToken}
               className="w-full bg-white text-black font-semibold rounded-lg py-3 hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              {loading ? 'Creating Account...' : (
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                  Creating Account...
+                </>
+              ) : (
                 <>
                   Create Account
                   <ArrowRight className="h-5 w-5" />

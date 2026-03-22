@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Order } from '../types';
+import { Order, User } from '../types';
 import api from '../services/api';
 import LocationMap from '../components/LocationMap';
+import { Bike } from 'lucide-react';
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [riders, setRiders] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchOrders();
+    fetchRiders();
   }, []);
 
   const fetchOrders = async () => {
@@ -22,12 +25,35 @@ const AdminOrders = () => {
     }
   };
 
+  const fetchRiders = async () => {
+    try {
+      const response = await api.get('/riders/available');
+      setRiders(response.data.data);
+    } catch (error) {
+      console.error('Failed to fetch riders:', error);
+    }
+  };
+
   const updateStatus = async (orderId: string, status: string) => {
     try {
       await api.put(`/orders/${orderId}/status`, { status });
       fetchOrders();
     } catch (error: any) {
       alert(error.response?.data?.message || 'Failed to update status');
+    }
+  };
+
+  const assignRider = async (orderId: string, riderId: string) => {
+    try {
+      console.log('Assigning rider:', { orderId, riderId });
+      const response = await api.post('/riders/assign-order', { orderId, riderId });
+      console.log('Assignment response:', response.data);
+      fetchOrders();
+      alert('Rider assigned successfully');
+    } catch (error: any) {
+      console.error('Assignment error:', error);
+      console.error('Error response:', error.response?.data);
+      alert(error.response?.data?.message || 'Failed to assign rider');
     }
   };
 
@@ -121,6 +147,36 @@ const AdminOrders = () => {
                   <option value="delivered">Delivered</option>
                   <option value="cancelled">Cancelled</option>
                 </select>
+              </div>
+
+              {/* Rider Assignment */}
+              <div className="mt-4">
+                <label className="block text-sm font-medium mb-2 text-gray-300 flex items-center gap-2">
+                  <Bike className="w-4 h-4" />
+                  Assign Rider
+                </label>
+                {order.riderId ? (
+                  <div className="px-4 py-3 bg-green-500/10 border border-green-500/50 rounded-lg text-green-400 text-sm">
+                    Rider assigned (ID: {order.riderId})
+                  </div>
+                ) : (
+                  <select
+                    onChange={(e) => e.target.value && assignRider(order._id, e.target.value)}
+                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                    defaultValue=""
+                  >
+                    <option value="" disabled>Select a rider...</option>
+                    {riders.length === 0 ? (
+                      <option value="" disabled>No available riders</option>
+                    ) : (
+                      riders.map((rider) => (
+                        <option key={rider._id || rider.userId} value={rider._id || rider.userId}>
+                          {rider.name} - {rider.vehicleType}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                )}
               </div>
             </div>
           ))}

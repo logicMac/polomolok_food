@@ -31,8 +31,36 @@ const userSchema = new Schema<IUserDocument>({
   },
   role: {
     type: String,
-    enum: ['admin', 'customer'],
+    enum: ['admin', 'customer', 'rider'],
     default: 'customer'
+  },
+  // Rider-specific fields
+  phoneNumber: {
+    type: String,
+    trim: true
+  },
+  vehicleType: {
+    type: String,
+    enum: ['motorcycle', 'bicycle', 'car', 'scooter'],
+    required: function(this: any) {
+      return this.role === 'rider';
+    }
+  },
+  vehicleNumber: {
+    type: String,
+    trim: true
+  },
+  isAvailable: {
+    type: Boolean,
+    default: true
+  },
+  currentLocation: {
+    latitude: Number,
+    longitude: Number,
+    lastUpdated: Date
+  },
+  image: {
+    type: String
   },
   otp: {
     type: String,

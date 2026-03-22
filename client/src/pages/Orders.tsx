@@ -1,15 +1,35 @@
 import { useState, useEffect } from 'react';
 import { Order } from '../types';
 import api from '../services/api';
-import { Package, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Package, Clock, CheckCircle, XCircle, Eye } from 'lucide-react';
+import { useSocket } from '../context/SocketContext';
+import { OrderTracking } from '../components/OrderTracking';
+import { ChatSupport } from '../components/ChatSupport';
+import { Button } from '../components/ui/Button';
 
 const Orders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
+  const { socket } = useSocket();
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+
+    if (socket) {
+      socket.on('order-update', (updatedOrder: Order) => {
+        setOrders(prev => 
+          prev.map(order => 
+            order._id === updatedOrder._id ? updatedOrder : order
+          )
+        );
+      });
+
+      return () => {
+        socket.off('order-update');
+      };
+    }
+  }, [socket]);
 
   const fetchOrders = async () => {
     try {
@@ -43,10 +63,32 @@ const Orders = () => {
         return 'bg-blue-500/10 text-blue-400 border-blue-500/50';
       case 'preparing':
         return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/50';
+      case 'out-for-delivery':
+        return 'bg-purple-500/10 text-purple-400 border-purple-500/50';
       default:
         return 'bg-gray-500/10 text-gray-400 border-gray-500/50';
     }
   };
+
+  if (selectedOrder) {
+    return (
+      <div className="min-h-screen bg-black py-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Button
+            onClick={() => setSelectedOrder(null)}
+            variant="outline"
+            className="mb-6"
+          >
+            ← Back to Orders
+          </Button>
+          <OrderTracking orderId={selectedOrder} />
+          <div className="mt-6">
+            <ChatSupport orderId={selectedOrder} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -120,11 +162,25 @@ const Orders = () => {
                   <p className="text-xs text-gray-500 mt-2">
                     Ordered on {new Date(order.createdAt).toLocaleString()}
                   </p>
+                  
+                  {/* Track Order Button */}
+                  {!['delivered', 'cancelled'].includes(order.status) && (
+                    <Button
+                      onClick={() => setSelectedOrder(order._id)}
+                      className="mt-4 w-full flex items-center justify-center gap-2"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Track Order
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         )}
+        
+        {/* Chat Support */}
+        <ChatSupport />
       </div>
     </div>
   );

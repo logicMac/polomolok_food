@@ -1,8 +1,14 @@
 export interface User {
-  userId: string;
+  _id?: string;
+  userId?: string;
   name: string;
   email: string;
-  role: 'admin' | 'customer';
+  role: 'admin' | 'customer' | 'rider';
+  phoneNumber?: string;
+  vehicleType?: 'motorcycle' | 'bicycle' | 'car' | 'scooter';
+  vehicleNumber?: string;
+  isAvailable?: boolean;
+  image?: string;
   createdAt?: string;
 }
 
@@ -11,7 +17,11 @@ export interface Food {
   name: string;
   description: string;
   category: string;
+  cuisine?: string;
+  dietaryTags?: string[];
+  ingredients?: string[];
   price: number;
+  preparationTime?: number;
   image: string;
   available: boolean;
   createdAt?: string;
@@ -27,16 +37,40 @@ export interface OrderItem {
 export interface Order {
   _id: string;
   userId: string;
+  riderId?: string;
   items: OrderItem[];
   totalPrice: number;
-  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'out-for-delivery' | 'delivered' | 'cancelled';
   deliveryAddress: string;
   phoneNumber: string;
   location?: {
     latitude: number;
     longitude: number;
   };
+  estimatedDeliveryTime?: string;
+  driverLocation?: {
+    latitude: number;
+    longitude: number;
+    lastUpdated: string;
+  };
+  statusHistory?: Array<{
+    status: string;
+    timestamp: string;
+    note?: string;
+  }>;
   createdAt: string;
+}
+
+export interface ChatMessage {
+  _id?: string;
+  userId: string;
+  userName: string;
+  message: string;
+  sender: 'user' | 'admin' | 'system';
+  orderId?: string;
+  isRead: boolean;
+  createdAt?: string;
+  timestamp?: string;
 }
 
 export interface CartItem {

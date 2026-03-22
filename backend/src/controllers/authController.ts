@@ -278,16 +278,27 @@ export const verifyOTP = async (req: Request, res: Response): Promise<void> => {
     // Log successful login
     securityLogger.logSuccessfulLogin(user._id.toString(), email, clientIp);
 
+    const userData: any = {
+      userId: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    };
+
+    // Add rider-specific fields if user is a rider
+    if (user.role === 'rider') {
+      userData.phoneNumber = user.phoneNumber;
+      userData.vehicleType = user.vehicleType;
+      userData.vehicleNumber = user.vehicleNumber;
+      userData.isAvailable = user.isAvailable;
+      userData.image = user.image;
+    }
+
     res.status(200).json({
       success: true,
       message: 'Login successful',
       data: {
-        user: {
-          userId: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role
-        }
+        user: userData
       }
     });
   } catch (error: any) {
@@ -353,15 +364,26 @@ export const getProfile = async (req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
+    const userData: any = {
+      userId: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt
+    };
+
+    // Add rider-specific fields if user is a rider
+    if (user.role === 'rider') {
+      userData.phoneNumber = user.phoneNumber;
+      userData.vehicleType = user.vehicleType;
+      userData.vehicleNumber = user.vehicleNumber;
+      userData.isAvailable = user.isAvailable;
+      userData.image = user.image;
+    }
+
     res.status(200).json({
       success: true,
-      data: {
-        userId: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        createdAt: user.createdAt
-      }
+      data: userData
     });
   } catch (error: any) {
     res.status(500).json({

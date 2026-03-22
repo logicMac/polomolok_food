@@ -169,7 +169,7 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(clientBuildPath));
   
   // Handle React routing - return all requests to React app
-  app.get('*', (req, res) => {
+  app.use((req, res) => {
     const indexPath = path.join(clientBuildPath, 'index.html');
     console.log('📄 Serving index.html from:', indexPath);
     res.sendFile(indexPath);

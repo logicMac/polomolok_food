@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: polomolok-food
+    env: node
+    region: singapore
+    plan: free
+    buildCommand: cd client && npm install && npm run build && cd ../backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000

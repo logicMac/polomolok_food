@@ -82,8 +82,7 @@ export const FoodFilters: React.FC<FoodFiltersProps> = ({ onFilterChange }) => {
         </div>
         <Button
           onClick={() => setShowFilters(!showFilters)}
-          variant="outline"
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 bg-black text-white hover:bg-zinc-800 border-black"
         >
           <Filter className="w-4 h-4" />
           Filters

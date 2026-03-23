@@ -26,9 +26,12 @@ const FoodCard = ({ food }: FoodCardProps) => {
     <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition-all duration-300 group">
       <div className="aspect-video bg-zinc-800 overflow-hidden">
         <img
-          src={`http://localhost:5000${food.image}`}
+          src={`${import.meta.env.VITE_API_URL}${food.image}`}
           alt={food.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          onError={(e) => {
+            e.currentTarget.src = 'https://via.placeholder.com/400x300?text=No+Image';
+          }}
         />
       </div>
       <div className="p-4">

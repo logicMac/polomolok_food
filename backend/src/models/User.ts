@@ -39,6 +39,10 @@ const userSchema = new Schema<IUserDocument>({
     type: String,
     trim: true
   },
+  address: {
+    type: String,
+    trim: true
+  },
   vehicleType: {
     type: String,
     enum: ['motorcycle', 'bicycle', 'car', 'scooter'],

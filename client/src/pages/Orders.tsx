@@ -5,7 +5,6 @@ import { Package, Clock, CheckCircle, XCircle, Eye } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
 import { OrderTracking } from '../components/OrderTracking';
 import { ChatSupport } from '../components/ChatSupport';
-import { Button } from '../components/ui/Button';
 
 const Orders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -74,13 +73,12 @@ const Orders = () => {
     return (
       <div className="min-h-screen bg-black py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Button
+          <button
             onClick={() => setSelectedOrder(null)}
-            variant="outline"
-            className="mb-6"
+            className="mb-6 px-4 py-2 border border-zinc-700 text-white rounded-lg hover:bg-zinc-800 transition flex items-center gap-2"
           >
             ← Back to Orders
-          </Button>
+          </button>
           <OrderTracking orderId={selectedOrder} />
           <div className="mt-6">
             <ChatSupport orderId={selectedOrder} />
@@ -99,79 +97,107 @@ const Orders = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold mb-8 text-white">My Orders</h1>
+    <div className="min-h-screen bg-black py-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-10">
+          <h1 className="text-4xl font-bold text-white mb-2">My Orders</h1>
+          <p className="text-gray-400">Track and manage your food orders</p>
+        </div>
 
         {orders.length === 0 ? (
-          <div className="text-center py-20 bg-zinc-900 border border-zinc-800 rounded-lg">
-            <Package className="w-24 h-24 mx-auto mb-4 text-gray-600" />
-            <h2 className="text-2xl font-bold mb-2 text-white">No orders yet</h2>
-            <p className="text-gray-400">Start ordering delicious food!</p>
+          <div className="text-center py-32 bg-zinc-900 border border-zinc-800 rounded-2xl">
+            <div className="inline-block p-8 bg-black border border-zinc-800 rounded-2xl mb-6">
+              <Package className="w-24 h-24 mx-auto text-gray-600" />
+            </div>
+            <h2 className="text-3xl font-bold mb-3 text-white">No orders yet</h2>
+            <p className="text-gray-400 text-lg mb-8">Start ordering delicious food!</p>
+            <button
+              onClick={() => window.location.href = '/'}
+              className="bg-white text-black px-8 py-4 rounded-xl font-semibold hover:bg-gray-200 transition-all hover:scale-105 active:scale-95 shadow-lg inline-flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              Browse Menu
+            </button>
           </div>
         ) : (
           <div className="space-y-6">
-            {orders.map((order) => (
-              <div key={order._id} className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
-                <div className="flex justify-between items-start mb-4">
+            {orders.map((order, index) => (
+              <div 
+                key={order._id} 
+                className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-all animate-fade-in"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
                   <div>
-                    <p className="text-sm text-gray-400">Order ID</p>
-                    <p className="font-mono text-sm text-gray-300">{order._id}</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Order ID</p>
+                    <p className="font-mono text-sm text-gray-300 bg-black px-3 py-1.5 rounded-lg inline-block border border-zinc-800">
+                      {order._id}
+                    </p>
                   </div>
-                  <div className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg border ${getStatusColor(order.status)}`}>
+                  <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border ${getStatusColor(order.status)}`}>
                     {getStatusIcon(order.status)}
-                    <span className="font-semibold capitalize">{order.status}</span>
+                    <span className="font-bold capitalize text-sm">{order.status.replace('-', ' ')}</span>
                   </div>
                 </div>
 
-                <div className="space-y-2 mb-4">
+                <div className="space-y-3 mb-6 pb-6 border-b border-zinc-800">
                   {order.items.map((item, index) => (
-                    <div key={index} className="flex justify-between text-sm text-gray-300">
-                      <span>
-                        {item.name} x {item.quantity}
+                    <div key={index} className="flex justify-between items-center text-sm bg-black px-4 py-3 rounded-lg">
+                      <span className="text-gray-300">
+                        <span className="font-semibold text-white">{item.name}</span>
+                        <span className="text-gray-500 ml-2">× {item.quantity}</span>
                       </span>
-                      <span>₱{(item.price * item.quantity).toFixed(2)}</span>
+                      <span className="font-semibold text-white">₱{(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
 
-                <div className="border-t border-zinc-800 pt-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-bold text-white">Total</span>
-                    <span className="text-xl font-bold text-white">₱{order.totalPrice.toFixed(2)}</span>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center pb-4 border-b border-zinc-800">
+                    <span className="font-bold text-lg text-white">Total Amount</span>
+                    <span className="text-2xl font-bold text-white">₱{order.totalPrice.toFixed(2)}</span>
                   </div>
-                  <p className="text-sm text-gray-400 mb-1">
-                    <span className="font-semibold text-gray-300">Phone:</span> {order.phoneNumber}
-                  </p>
-                  <p className="text-sm text-gray-400 mb-1">
-                    <span className="font-semibold text-gray-300">Address:</span> {order.deliveryAddress}
-                  </p>
-                  {order.location && (
-                    <a
-                      href={`https://www.google.com/maps?q=${order.location.latitude},${order.location.longitude}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 mt-1"
-                    >
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      </svg>
-                      View on map
-                    </a>
-                  )}
-                  <p className="text-xs text-gray-500 mt-2">
-                    Ordered on {new Date(order.createdAt).toLocaleString()}
-                  </p>
+                  
+                  <div className="grid sm:grid-cols-2 gap-4 text-sm">
+                    <div className="bg-black p-4 rounded-lg border border-zinc-800">
+                      <p className="text-gray-500 mb-1 text-xs uppercase tracking-wider">Phone Number</p>
+                      <p className="text-white font-medium">{order.phoneNumber}</p>
+                    </div>
+                    <div className="bg-black p-4 rounded-lg border border-zinc-800">
+                      <p className="text-gray-500 mb-1 text-xs uppercase tracking-wider">Order Date</p>
+                      <p className="text-white font-medium">{new Date(order.createdAt).toLocaleString()}</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-black p-4 rounded-lg border border-zinc-800">
+                    <p className="text-gray-500 mb-2 text-xs uppercase tracking-wider">Delivery Address</p>
+                    <p className="text-white font-medium mb-2">{order.deliveryAddress}</p>
+                    {order.location && (
+                      <a
+                        href={`https://www.google.com/maps?q=${order.location.latitude},${order.location.longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-2 mt-2 hover:underline"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        </svg>
+                        View location on Google Maps
+                      </a>
+                    )}
+                  </div>
                   
                   {/* Track Order Button */}
                   {!['delivered', 'cancelled'].includes(order.status) && (
-                    <Button
+                    <button
                       onClick={() => setSelectedOrder(order._id)}
-                      className="mt-4 w-full flex items-center justify-center gap-2"
+                      className="w-full flex items-center justify-center gap-2 bg-white text-black py-4 px-6 rounded-xl hover:bg-gray-200 transition-all hover:scale-105 active:scale-95 font-bold text-lg shadow-lg"
                     >
-                      <Eye className="w-4 h-4" />
-                      Track Order
-                    </Button>
+                      <Eye className="w-5 h-5" />
+                      Track Order Live
+                    </button>
                   )}
                 </div>
               </div>

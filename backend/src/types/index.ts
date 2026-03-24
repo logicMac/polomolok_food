@@ -8,6 +8,7 @@ export interface IUser {
   password: string;
   role: 'admin' | 'customer' | 'rider';
   phoneNumber?: string;
+  address?: string;
   vehicleType?: 'motorcycle' | 'bicycle' | 'car' | 'scooter';
   vehicleNumber?: string;
   isAvailable?: boolean;
@@ -39,6 +40,9 @@ export interface IFood {
   preparationTime?: number;
   image: string;
   available: boolean;
+  stock?: number;
+  lowStockThreshold?: number;
+  trackInventory?: boolean;
   createdAt: Date;
 }
 

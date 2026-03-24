@@ -149,25 +149,32 @@ const Login = () => {
   }, [isLocked, lockTimeRemaining]);  
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left Side - Form */}
-      <div className="w-full lg:w-1/2 bg-black flex items-center justify-center p-8">
+      <div className="w-full lg:w-1/2 bg-black flex items-center justify-center p-4 sm:p-8 lg:p-12">
         <div className="w-full max-w-md">
           {/* Logo/Brand */}
-          <div className="mb-12">
-            <h1 className="text-3xl font-bold text-white mb-2">Food Order</h1>
-            <p className="text-gray-400">Polomolok's finest delivery</p>
+          <div className="mb-8 lg:mb-12 text-center lg:text-left">
+            <div className="inline-flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">Food Order</h1>
+            </div>
+            <p className="text-gray-400 text-sm sm:text-base">Polomolok's finest delivery</p>
           </div>
 
           {!showOTP ? (
             <>
               {/* Login Form */}
-              <div className="mb-8">
-                <h2 className="text-2xl font-semibold text-white mb-2">Welcome back</h2>
-                <p className="text-gray-400">Please enter your details to sign in</p>
+              <div className="mb-6 lg:mb-8 text-center lg:text-left">
+                <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">Welcome back</h2>
+                <p className="text-gray-400 text-sm sm:text-base">Please enter your details to sign in</p>
               </div>
 
-              <form onSubmit={handleLogin} className="space-y-5">
+              <form onSubmit={handleLogin} className="space-y-4 sm:space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Email
@@ -178,7 +185,7 @@ const Login = () => {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-11 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-11 pr-4 py-3 sm:py-3.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition text-sm sm:text-base"
                       placeholder="your@email.com"
                       required
                     />
@@ -195,7 +202,7 @@ const Login = () => {
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-11 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-11 pr-4 py-3 sm:py-3.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition text-sm sm:text-base"
                       placeholder="••••••••"
                       required
                     />
@@ -203,9 +210,9 @@ const Login = () => {
                 </div>
 
                 {error && (
-                  <div key={error} className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 text-sm text-red-400 animate-shake">
-                    <div className="flex items-start gap-3">
-                      <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <div key={error} className="bg-red-500/10 border border-red-500/50 rounded-xl p-3 sm:p-4 text-xs sm:text-sm text-red-400 animate-shake">
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5" />
                       <div>
                         <p className="font-semibold mb-1">Login Failed</p>
                         <p>{error}</p>
@@ -215,9 +222,9 @@ const Login = () => {
                 )}
 
                 {message && (
-                  <div className="bg-green-500/10 border border-green-500/50 rounded-lg p-4 text-sm text-green-400">
-                    <div className="flex items-start gap-3">
-                      <Shield className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <div className="bg-green-500/10 border border-green-500/50 rounded-xl p-3 sm:p-4 text-xs sm:text-sm text-green-400">
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <Shield className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5" />
                       <p>{message}</p>
                     </div>
                   </div>
@@ -226,14 +233,14 @@ const Login = () => {
                 {loginAttempts > 0 && loginAttempts < 10 && (
                   <div className={`flex items-center justify-center gap-2 text-xs ${loginAttempts >= 7 ? 'text-yellow-400' : 'text-gray-400'}`}>
                     <AlertCircle className="w-3 h-3" />
-                    <span>{10 - loginAttempts} login {10 - loginAttempts === 1 ? 'attempt' : 'attempts'} remaining (resets in 15 min)</span>
+                    <span>{10 - loginAttempts} login {10 - loginAttempts === 1 ? 'attempt' : 'attempts'} remaining</span>
                   </div>
                 )}
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-white text-black font-semibold rounded-lg py-3 hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full bg-white text-black font-semibold rounded-xl py-3 sm:py-3.5 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 shadow-lg text-sm sm:text-base"
                 >
                   {loading ? (
                     <>
@@ -243,13 +250,13 @@ const Login = () => {
                   ) : (
                     <>
                       Sign In
-                      <ArrowRight className="h-5 w-5" />
+                      <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
                     </>
                   )}
                 </button>
               </form>
 
-              <div className="mt-8 text-center">
+              <div className="mt-6 sm:mt-8 text-center text-sm sm:text-base">
                 <span className="text-gray-400">Don't have an account? </span>
                 <Link to="/register" className="text-white font-medium hover:underline">
                   Sign up
@@ -259,21 +266,21 @@ const Login = () => {
           ) : (
             <>
               {/* OTP Verification */}
-              <div className="mb-8 text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-zinc-900 rounded-full mb-4">
-                  <Shield className="h-8 w-8 text-white" />
+              <div className="mb-6 sm:mb-8 text-center">
+                <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-zinc-900 rounded-full mb-4 border border-zinc-800">
+                  <Shield className="h-7 w-7 sm:h-8 sm:w-8 text-white" />
                 </div>
-                <h2 className="text-2xl font-semibold text-white mb-2">Verify OTP</h2>
-                <p className="text-gray-400">Enter the 6-digit code sent to your email</p>
+                <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">Verify OTP</h2>
+                <p className="text-gray-400 text-sm sm:text-base px-4">Enter the 6-digit code sent to your email</p>
               </div>
 
               {message && (
-                <div className="bg-blue-500/10 border border-blue-500/50 rounded-lg p-3 text-sm text-blue-400 mb-5 text-center">
+                <div className="bg-blue-500/10 border border-blue-500/50 rounded-xl p-3 text-xs sm:text-sm text-blue-400 mb-5 text-center">
                   {message}
                 </div>
               )}
 
-              <form onSubmit={handleVerifyOTP} className="space-y-5" onReset={(e) => e.preventDefault()}>
+              <form onSubmit={handleVerifyOTP} className="space-y-4 sm:space-y-5" onReset={(e) => e.preventDefault()}>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2 text-center">
                     OTP Code
@@ -282,7 +289,7 @@ const Login = () => {
                     type="text"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-white text-center text-2xl font-bold tracking-[0.5em] placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 sm:py-4 text-white text-center text-xl sm:text-2xl font-bold tracking-[0.5em] placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="000000"
                     maxLength={6}
                     disabled={isLocked}
@@ -294,23 +301,23 @@ const Login = () => {
                   {rateLimitRemaining !== null && rateLimitRemaining > 0 && (
                     <div className={`flex items-center justify-center gap-2 text-xs mt-2 ${rateLimitRemaining <= 2 ? 'text-yellow-400' : 'text-gray-400'}`}>
                       <AlertCircle className="w-3 h-3" />
-                      <span>{rateLimitRemaining} {rateLimitRemaining === 1 ? 'attempt' : 'attempts'} remaining (5 max per 5 min)</span>
+                      <span>{rateLimitRemaining} {rateLimitRemaining === 1 ? 'attempt' : 'attempts'} remaining</span>
                     </div>
                   )}
                   {isLocked && (
-                    <div className="flex items-center justify-center gap-2 text-sm mt-3 text-red-400 bg-red-500/10 border border-red-500/50 rounded-lg p-3">
+                    <div className="flex items-center justify-center gap-2 text-xs sm:text-sm mt-3 text-red-400 bg-red-500/10 border border-red-500/50 rounded-xl p-3">
                       <Clock className="w-4 h-4 animate-pulse" />
                       <span>
-                        Account locked. Try again in {Math.floor(lockTimeRemaining / 60)}:{String(lockTimeRemaining % 60).padStart(2, '0')}
+                        Locked. Try in {Math.floor(lockTimeRemaining / 60)}:{String(lockTimeRemaining % 60).padStart(2, '0')}
                       </span>
                     </div>
                   )}
                 </div>
 
                 {error && (
-                  <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 text-sm text-red-400 animate-shake">
-                    <div className="flex items-start gap-3">
-                      <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <div className="bg-red-500/10 border border-red-500/50 rounded-xl p-3 sm:p-4 text-xs sm:text-sm text-red-400 animate-shake">
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5" />
                       <div>
                         <p className="font-semibold mb-1">Verification Failed</p>
                         <p>{error}</p>
@@ -322,7 +329,7 @@ const Login = () => {
                 <button
                   type="submit"
                   disabled={loading || otp.length !== 6 || isLocked}
-                  className="w-full bg-white text-black font-semibold rounded-lg py-3 hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full bg-white text-black font-semibold rounded-xl py-3 sm:py-3.5 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 shadow-lg text-sm sm:text-base"
                 >
                   {loading ? (
                     <>
@@ -346,7 +353,7 @@ const Login = () => {
                     setOtpAttempts(0);
                     setRateLimitRemaining(null);
                   }}
-                  className="w-full bg-zinc-900 text-white font-medium rounded-lg py-3 hover:bg-zinc-800 transition"
+                  className="w-full bg-zinc-900 text-white font-medium rounded-xl py-3 sm:py-3.5 hover:bg-zinc-800 transition border border-zinc-800 text-sm sm:text-base"
                 >
                   Back to login
                 </button>
@@ -357,7 +364,7 @@ const Login = () => {
       </div>
 
       {/* Right Side - Background Image */}
-      <div className="hidden lg:block lg:w-1/2 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         <div 
           className="absolute inset-0"
           style={{
@@ -367,24 +374,32 @@ const Login = () => {
             backgroundRepeat: 'no-repeat'
           }}
         >
-          {/* Dark overlay for better text readability */}
-          <div className="absolute inset-0 bg-black/50"></div>
+          {/* Dark overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70"></div>
         </div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center px-8 relative z-10">
-            <div className="mb-8">
-              <div className="inline-block p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
+        <div className="absolute inset-0 flex items-center justify-center p-12">
+          <div className="text-center relative z-10 max-w-lg">
+            <div className="mb-8 animate-fade-in">
+              <div className="inline-block p-5 bg-white/10 rounded-3xl backdrop-blur-sm border border-white/20">
                 <svg className="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
             </div>
-            <h2 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
+            <h2 className="text-4xl xl:text-5xl font-bold text-white mb-6 drop-shadow-2xl leading-tight">
               Order Your Favorite Food
             </h2>
-            <p className="text-xl text-gray-200 max-w-md mx-auto drop-shadow-lg">
+            <p className="text-lg xl:text-xl text-gray-100 drop-shadow-lg leading-relaxed">
               Fast delivery, fresh ingredients, and delicious meals delivered right to your door in Polomolok
             </p>
+            <div className="mt-10 flex flex-wrap justify-center gap-4">
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-3">
+                <p className="text-white font-semibold">⚡ Fast Delivery</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-3">
+                <p className="text-white font-semibold">🎯 Track Orders</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

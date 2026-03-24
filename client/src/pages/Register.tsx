@@ -63,23 +63,30 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left Side - Form */}
-      <div className="w-full lg:w-1/2 bg-black flex items-center justify-center p-8">
+      <div className="w-full lg:w-1/2 bg-black flex items-center justify-center p-4 sm:p-8 lg:p-12">
         <div className="w-full max-w-md">
           {/* Logo/Brand */}
-          <div className="mb-12">
-            <h1 className="text-3xl font-bold text-white mb-2">Food Order</h1>
-            <p className="text-gray-400">Polomolok's finest delivery</p>
+          <div className="mb-6 lg:mb-10 text-center lg:text-left">
+            <div className="inline-flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">Food Order</h1>
+            </div>
+            <p className="text-gray-400 text-sm sm:text-base">Polomolok's finest delivery</p>
           </div>
 
           {/* Register Form */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-semibold text-white mb-2">Create account</h2>
-            <p className="text-gray-400">Join us and start ordering delicious food</p>
+          <div className="mb-6 text-center lg:text-left">
+            <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">Create account</h2>
+            <p className="text-gray-400 text-sm sm:text-base">Join us and start ordering delicious food</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Full Name
@@ -90,7 +97,7 @@ const Register = () => {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-11 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition text-sm sm:text-base"
                   placeholder="John Doe"
                   required
                 />
@@ -107,7 +114,7 @@ const Register = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-11 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition text-sm sm:text-base"
                   placeholder="your@email.com"
                   required
                 />
@@ -124,12 +131,12 @@ const Register = () => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-11 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition text-sm sm:text-base"
                   placeholder="••••••••"
                   required
                 />
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 mt-1.5">
                 Min 8 characters, 1 uppercase, 1 lowercase, 1 number
               </p>
             </div>
@@ -144,7 +151,7 @@ const Register = () => {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-11 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition text-sm sm:text-base"
                   placeholder="••••••••"
                   required
                 />
@@ -152,9 +159,9 @@ const Register = () => {
             </div>
 
             {error && (
-              <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 text-sm text-red-400 animate-shake">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+              <div className="bg-red-500/10 border border-red-500/50 rounded-xl p-3 sm:p-4 text-xs sm:text-sm text-red-400 animate-shake">
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-semibold mb-1">Registration Failed</p>
                     <p>{error}</p>
@@ -166,19 +173,21 @@ const Register = () => {
             {/* reCAPTCHA */}
             <div className="w-full">
               <div className="flex justify-center">
-                <ReCAPTCHA
-                  ref={recaptchaRef}
-                  sitekey={(import.meta as any).env.VITE_RECAPTCHA_SITE_KEY}
-                  onChange={handleRecaptchaChange}
-                  theme="dark"
-                />
+                <div className="transform scale-90 sm:scale-100 origin-center">
+                  <ReCAPTCHA
+                    ref={recaptchaRef}
+                    sitekey={(import.meta as any).env.VITE_RECAPTCHA_SITE_KEY}
+                    onChange={handleRecaptchaChange}
+                    theme="dark"
+                  />
+                </div>
               </div>
             </div>
 
             <button
               type="submit"
               disabled={loading || !recaptchaToken}
-              className="w-full bg-white text-black font-semibold rounded-lg py-3 hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-white text-black font-semibold rounded-xl py-3 sm:py-3.5 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 shadow-lg text-sm sm:text-base"
             >
               {loading ? (
                 <>
@@ -188,13 +197,13 @@ const Register = () => {
               ) : (
                 <>
                   Create Account
-                  <ArrowRight className="h-5 w-5" />
+                  <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-8 text-center">
+          <div className="mt-6 text-center text-sm sm:text-base">
             <span className="text-gray-400">Already have an account? </span>
             <Link to="/login" className="text-white font-medium hover:underline">
               Sign in
@@ -204,7 +213,7 @@ const Register = () => {
       </div>
 
       {/* Right Side - Background Image */}
-      <div className="hidden lg:block lg:w-1/2 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         <div 
           className="absolute inset-0"
           style={{
@@ -214,24 +223,32 @@ const Register = () => {
             backgroundRepeat: 'no-repeat'
           }}
         >
-          {/* Dark overlay for better text readability */}
-          <div className="absolute inset-0 bg-black/50"></div>
+          {/* Dark overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70"></div>
         </div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center px-8 relative z-10">
-            <div className="mb-8">
-              <div className="inline-block p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
+        <div className="absolute inset-0 flex items-center justify-center p-12">
+          <div className="text-center relative z-10 max-w-lg">
+            <div className="mb-8 animate-fade-in">
+              <div className="inline-block p-5 bg-white/10 rounded-3xl backdrop-blur-sm border border-white/20">
                 <svg className="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
             </div>
-            <h2 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
+            <h2 className="text-4xl xl:text-5xl font-bold text-white mb-6 drop-shadow-2xl leading-tight">
               Join Our Community
             </h2>
-            <p className="text-xl text-gray-200 max-w-md mx-auto drop-shadow-lg">
+            <p className="text-lg xl:text-xl text-gray-100 drop-shadow-lg leading-relaxed mb-10">
               Create an account and enjoy exclusive deals, fast delivery, and personalized recommendations
             </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-3">
+                <p className="text-white font-semibold">🎁 Welcome Bonus</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-3">
+                <p className="text-white font-semibold">💳 Easy Checkout</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import ChatMessage from '../models/ChatMessage';
 import { AuthRequest } from '../types';
+import { getIO } from '../config/socket';
 
 export const sendMessage = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -24,6 +25,34 @@ export const sendMessage = async (req: AuthRequest, res: Response): Promise<void
       orderId: orderId || undefined,
       isRead: false
     });
+
+    // Emit message via socket
+    try {
+      const io = getIO();
+      const messageData = {
+        _id: chatMessage._id,
+        userId: chatMessage.userId,
+        userName: chatMessage.userName,
+        message: chatMessage.message,
+        sender: chatMessage.sender,
+        orderId: chatMessage.orderId,
+        isRead: chatMessage.isRead,
+        createdAt: chatMessage.createdAt,
+        timestamp: chatMessage.createdAt
+      };
+
+      if (orderId) {
+        // Emit to order-specific room
+        io.to(`order:${orderId}`).emit('new-message', messageData);
+      } else {
+        // Emit to user and admin rooms
+        io.to(`user:${userId}`).emit('new-message', messageData);
+        io.to('admin').emit('new-message', messageData);
+      }
+    } catch (socketError) {
+      console.error('Socket emission error:', socketError);
+      // Don't fail the request if socket emission fails
+    }
 
     res.status(201).json({
       success: true,

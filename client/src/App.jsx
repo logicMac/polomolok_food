@@ -15,6 +15,7 @@ import AdminFoods from './pages/AdminFoods';
 import AdminOrders from './pages/AdminOrders';
 import AdminUsers from './pages/AdminUsers';
 import AdminRiders from './pages/AdminRiders';
+import AdminAnalytics from './pages/AdminAnalytics';
 import RiderDashboard from './pages/RiderDashboard';
 
 function App() {
@@ -23,7 +24,7 @@ function App() {
       <AuthProvider>
         <SocketProvider>
           <CartProvider>
-            <div className="min-h-screen bg-white">
+            <div className="min-h-screen bg-black">
               <Navbar />
               <Routes>
                 <Route path="/" element={<Home />} />
@@ -92,6 +93,14 @@ function App() {
                   element={
                     <ProtectedRoute adminOnly>
                       <AdminRiders />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/analytics"
+                  element={
+                    <ProtectedRoute adminOnly>
+                      <AdminAnalytics />
                     </ProtectedRoute>
                   }
                 />

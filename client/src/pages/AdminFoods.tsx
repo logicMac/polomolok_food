@@ -14,6 +14,9 @@ const AdminFoods = () => {
     category: 'Main Course',
     price: '',
     available: true,
+    trackInventory: false,
+    stock: '0',
+    lowStockThreshold: '10',
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
@@ -42,6 +45,9 @@ const AdminFoods = () => {
       formDataToSend.append('category', formData.category);
       formDataToSend.append('price', formData.price);
       formDataToSend.append('available', formData.available.toString());
+      formDataToSend.append('trackInventory', formData.trackInventory.toString());
+      formDataToSend.append('stock', formData.stock);
+      formDataToSend.append('lowStockThreshold', formData.lowStockThreshold);
       
       if (imageFile) {
         formDataToSend.append('image', imageFile);
@@ -84,8 +90,11 @@ const AdminFoods = () => {
       category: food.category,
       price: food.price.toString(),
       available: food.available,
+      trackInventory: food.trackInventory || false,
+      stock: (food.stock || 0).toString(),
+      lowStockThreshold: (food.lowStockThreshold || 10).toString(),
     });
-    setImagePreview(`http://localhost:5000${food.image}`);
+    setImagePreview(getImageUrl(food.image));
     setShowModal(true);
   };
 
@@ -101,6 +110,15 @@ const AdminFoods = () => {
     }
   };
 
+  const getImageUrl = (imagePath: string) => {
+    if (!imagePath) return '';
+    if (imagePath.startsWith('http')) return imagePath;
+    const cleanPath = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const baseUrl = apiUrl.replace('/api', '');
+    return `${baseUrl}/${cleanPath}`;
+  };
+
   const resetForm = () => {
     setFormData({
       name: '',
@@ -108,6 +126,9 @@ const AdminFoods = () => {
       category: 'Main Course',
       price: '',
       available: true,
+      trackInventory: false,
+      stock: '0',
+      lowStockThreshold: '10',
     });
     setImageFile(null);
     setImagePreview('');
@@ -140,7 +161,14 @@ const AdminFoods = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {foods.map((food) => (
             <div key={food._id} className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition">
-              <img src={`http://localhost:5000${food.image}`} alt={food.name} className="w-full h-48 object-cover" />
+              <img 
+                src={getImageUrl(food.image)} 
+                alt={food.name} 
+                className="w-full h-48 object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = 'https://via.placeholder.com/400x300?text=No+Image';
+                }}
+              />
               <div className="p-4">
                 <h3 className="font-bold text-lg mb-2 text-white">{food.name}</h3>
                 <p className="text-sm text-gray-400 mb-2 line-clamp-2">{food.description}</p>
@@ -253,6 +281,40 @@ const AdminFoods = () => {
                   />
                   <label className="text-sm font-medium text-gray-300">Available</label>
                 </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.trackInventory}
+                    onChange={(e) => setFormData({ ...formData, trackInventory: e.target.checked })}
+                    className="w-4 h-4 rounded"
+                  />
+                  <label className="text-sm font-medium text-gray-300">Track Inventory</label>
+                </div>
+                {formData.trackInventory && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-gray-300">Stock Quantity</label>
+                      <input
+                        type="number"
+                        value={formData.stock}
+                        onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                        className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                        min="0"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-gray-300">Low Stock Threshold</label>
+                      <input
+                        type="number"
+                        value={formData.lowStockThreshold}
+                        onChange={(e) => setFormData({ ...formData, lowStockThreshold: e.target.value })}
+                        className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                        min="0"
+                      />
+                      <p className="text-xs text-gray-400 mt-1">Alert when stock falls below this number</p>
+                    </div>
+                  </>
+                )}
                 <div className="flex space-x-2 pt-2">
                   <button
                     type="submit"

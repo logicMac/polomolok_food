@@ -54,6 +54,20 @@ const foodSchema = new Schema<IFoodDocument>({
     type: Boolean,
     default: true
   },
+  stock: {
+    type: Number,
+    default: 0,
+    min: [0, 'Stock cannot be negative']
+  },
+  lowStockThreshold: {
+    type: Number,
+    default: 10,
+    min: [0, 'Threshold cannot be negative']
+  },
+  trackInventory: {
+    type: Boolean,
+    default: false
+  },
   createdAt: {
     type: Date,
     default: Date.now

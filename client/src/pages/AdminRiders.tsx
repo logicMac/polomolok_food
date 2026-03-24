@@ -127,70 +127,120 @@ const AdminRiders = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black py-8">
+    <div className="min-h-screen bg-black py-8 sm:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-white">Riders Management</h1>
-          <Button onClick={() => openModal()} className="flex items-center gap-2">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8 lg:mb-12">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Riders Management</h1>
+            <p className="text-gray-400 text-sm sm:text-base">Manage your delivery team</p>
+          </div>
+          <Button 
+            onClick={() => openModal()} 
+            className="flex items-center justify-center gap-2 bg-white text-black hover:bg-gray-200 px-6 py-3 rounded-xl font-semibold transition-all hover:scale-105 active:scale-95 shadow-lg"
+          >
             <Plus className="w-5 h-5" />
             Add Rider
           </Button>
         </div>
 
+        {/* Riders Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {riders.map((rider) => (
-            <div key={rider._id || rider.userId} className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center overflow-hidden">
-                    {rider.image ? (
-                      <img
-                        src={`http://localhost:5000${rider.image}`}
-                        alt={rider.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <Bike className="w-6 h-6 text-white" />
-                    )}
+            <div 
+              key={rider._id || rider.userId} 
+              className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-all hover:shadow-xl hover:shadow-white/5 group"
+            >
+              {/* Header with Avatar and Status */}
+              <div className="flex items-start justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center overflow-hidden ring-2 ring-zinc-800 group-hover:ring-white transition">
+                      {rider.image ? (
+                        <img
+                          src={`http://localhost:5000${rider.image}`}
+                          alt={rider.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Bike className="w-8 h-8 text-white" />
+                      )}
+                    </div>
+                    {/* Status indicator */}
+                    <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-zinc-900 ${
+                      rider.isAvailable ? 'bg-green-400' : 'bg-red-400'
+                    }`}></div>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white">{rider.name}</h3>
+                    <h3 className="text-lg font-bold text-white group-hover:text-gray-200 transition">{rider.name}</h3>
                     <p className="text-sm text-gray-400">{rider.email}</p>
                   </div>
                 </div>
-                {rider.isAvailable ? (
-                  <UserCheck className="w-5 h-5 text-green-400" />
-                ) : (
-                  <UserX className="w-5 h-5 text-red-400" />
-                )}
               </div>
 
-              <div className="space-y-2 mb-4">
-                <p className="text-sm text-gray-300">
-                  <span className="text-gray-500">Phone:</span> {rider.phoneNumber || 'N/A'}
-                </p>
-                <p className="text-sm text-gray-300">
-                  <span className="text-gray-500">Vehicle:</span> {rider.vehicleType || 'N/A'}
-                </p>
-                <p className="text-sm text-gray-300">
-                  <span className="text-gray-500">Plate:</span> {rider.vehicleNumber || 'N/A'}
-                </p>
-                <p className="text-sm">
-                  <span className={`px-2 py-1 rounded text-xs ${
-                    rider.isAvailable
-                      ? 'bg-green-500/20 text-green-400'
-                      : 'bg-red-500/20 text-red-400'
-                  }`}>
-                    {rider.isAvailable ? 'Available' : 'Unavailable'}
-                  </span>
-                </p>
+              {/* Details */}
+              <div className="space-y-3 mb-6 pb-6 border-b border-zinc-800">
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-gray-500">Phone</p>
+                    <p className="text-white font-medium">{rider.phoneNumber || 'N/A'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                    <Bike className="w-4 h-4 text-gray-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-gray-500">Vehicle</p>
+                    <p className="text-white font-medium capitalize">{rider.vehicleType || 'N/A'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-gray-500">Plate Number</p>
+                    <p className="text-white font-medium">{rider.vehicleNumber || 'N/A'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                    {rider.isAvailable ? (
+                      <UserCheck className="w-4 h-4 text-green-400" />
+                    ) : (
+                      <UserX className="w-4 h-4 text-red-400" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-gray-500">Status</p>
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+                      rider.isAvailable
+                        ? 'bg-green-500/10 text-green-400 border border-green-500/50'
+                        : 'bg-red-500/10 text-red-400 border border-red-500/50'
+                    }`}>
+                      {rider.isAvailable ? 'Available' : 'Unavailable'}
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex gap-2">
+              {/* Actions */}
+              <div className="grid grid-cols-2 gap-3">
                 <Button
                   onClick={() => openModal(rider)}
                   variant="outline"
-                  className="flex-1 flex items-center justify-center gap-2"
+                  className="flex items-center justify-center gap-2 bg-black border-zinc-800 hover:border-white hover:bg-zinc-900 text-white py-2.5 rounded-lg transition-all"
                 >
                   <Edit2 className="w-4 h-4" />
                   Edit
@@ -198,7 +248,7 @@ const AdminRiders = () => {
                 <Button
                   onClick={() => handleDelete(rider._id || rider.userId || '')}
                   variant="destructive"
-                  className="flex-1 flex items-center justify-center gap-2"
+                  className="flex items-center justify-center gap-2 bg-red-500/10 border border-red-500/50 hover:bg-red-500/20 text-red-400 py-2.5 rounded-lg transition-all"
                 >
                   <Trash2 className="w-4 h-4" />
                   Delete
@@ -208,13 +258,19 @@ const AdminRiders = () => {
           ))}
         </div>
 
+        {/* Empty State */}
         {riders.length === 0 && (
-          <div className="text-center py-20">
-            <Bike className="w-24 h-24 mx-auto mb-4 text-gray-600" />
-            <h2 className="text-2xl font-bold mb-2 text-white">No riders yet</h2>
-            <p className="text-gray-400 mb-6">Add your first rider to start managing deliveries</p>
-            <Button onClick={() => openModal()}>
-              <Plus className="w-5 h-5 mr-2" />
+          <div className="text-center py-32">
+            <div className="inline-block p-8 bg-zinc-900 border border-zinc-800 rounded-2xl mb-6">
+              <Bike className="w-24 h-24 mx-auto text-gray-600" />
+            </div>
+            <h2 className="text-3xl font-bold mb-3 text-white">No riders yet</h2>
+            <p className="text-gray-400 mb-8 text-lg">Add your first rider to start managing deliveries</p>
+            <Button 
+              onClick={() => openModal()}
+              className="bg-white text-black hover:bg-gray-200 px-8 py-4 rounded-xl font-semibold transition-all hover:scale-105 active:scale-95 shadow-lg inline-flex items-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
               Add Rider
             </Button>
           </div>
@@ -222,86 +278,108 @@ const AdminRiders = () => {
 
         {/* Modal */}
         {showModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-zinc-900 rounded-lg p-6 max-w-md w-full border border-zinc-800">
-              <h2 className="text-2xl font-bold text-white mb-6">
-                {editingRider ? 'Edit Rider' : 'Add New Rider'}
-              </h2>
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-zinc-900 rounded-2xl p-6 sm:p-8 max-w-md w-full border border-zinc-800 shadow-2xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white">
+                  {editingRider ? 'Edit Rider' : 'Add New Rider'}
+                </h2>
+                <button
+                  onClick={closeModal}
+                  className="p-2 hover:bg-zinc-800 rounded-lg transition"
+                >
+                  <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Profile Image</label>
+                  <label className="block text-sm font-semibold text-white mb-3">Profile Image</label>
                   <div className="flex items-center gap-4">
-                    {imagePreview && (
+                    {imagePreview ? (
                       <img
                         src={imagePreview}
                         alt="Preview"
                         className="w-20 h-20 rounded-full object-cover border-2 border-zinc-700"
                       />
+                    ) : (
+                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
+                        <Bike className="w-10 h-10 text-white" />
+                      </div>
                     )}
                     <input
                       type="file"
                       accept="image/*"
                       onChange={handleImageChange}
-                      className="flex-1 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      className="flex-1 px-3 py-2 bg-black border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white file:text-black hover:file:bg-gray-200 file:cursor-pointer"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Name</label>
+                  <label className="block text-sm font-semibold text-white mb-2">Name *</label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white transition"
+                    placeholder="John Doe"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                  <label className="block text-sm font-semibold text-white mb-2">Email *</label>
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white transition disabled:opacity-50"
+                    placeholder="rider@example.com"
                     required
                     disabled={!!editingRider}
                   />
+                  {editingRider && (
+                    <p className="text-xs text-gray-500 mt-1.5">Email cannot be changed</p>
+                  )}
                 </div>
 
                 {!editingRider && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                    <label className="block text-sm font-semibold text-white mb-2">Password *</label>
                     <input
                       type="password"
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white transition"
+                      placeholder="••••••••"
                       required={!editingRider}
                       minLength={8}
                     />
+                    <p className="text-xs text-gray-500 mt-1.5">Minimum 8 characters</p>
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Phone Number</label>
+                  <label className="block text-sm font-semibold text-white mb-2">Phone Number *</label>
                   <input
                     type="tel"
                     value={formData.phoneNumber}
                     onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                    className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white transition"
+                    placeholder="09123456789"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Vehicle Type</label>
+                  <label className="block text-sm font-semibold text-white mb-2">Vehicle Type *</label>
                   <select
                     value={formData.vehicleType}
                     onChange={(e) => setFormData({ ...formData, vehicleType: e.target.value as any })}
-                    className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white transition"
                     required
                   >
                     <option value="motorcycle">Motorcycle</option>
@@ -312,29 +390,30 @@ const AdminRiders = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Vehicle Number</label>
+                  <label className="block text-sm font-semibold text-white mb-2">Vehicle Number *</label>
                   <input
                     type="text"
                     value={formData.vehicleNumber}
                     onChange={(e) => setFormData({ ...formData, vehicleNumber: e.target.value })}
-                    className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white transition"
+                    placeholder="ABC-1234"
                     required
                   />
                 </div>
 
-                <div className="flex gap-3 pt-4">
+                <div className="grid grid-cols-2 gap-3 pt-4">
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="flex-1 px-4 py-2 bg-black text-white border border-zinc-700 rounded-lg hover:bg-zinc-900 transition font-medium"
+                    className="px-4 py-3 bg-black text-white border border-zinc-800 rounded-xl hover:bg-zinc-900 hover:border-white transition font-medium"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition font-semibold"
+                    className="px-4 py-3 bg-white text-black rounded-xl hover:bg-gray-200 transition-all hover:scale-105 active:scale-95 font-bold shadow-lg"
                   >
-                    {editingRider ? 'Update' : 'Create'} Rider
+                    {editingRider ? 'Update' : 'Create'}
                   </button>
                 </div>
               </form>

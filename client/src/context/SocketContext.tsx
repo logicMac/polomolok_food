@@ -23,7 +23,11 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (user) {
       const token = localStorage.getItem('accessToken');
       
-      const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
+      // Remove /api from the URL for socket connection
+      const apiUrl = (import.meta as any).env.VITE_API_URL || 'http://localhost:5000/api';
+      const socketUrl = apiUrl.replace('/api', '');
+      
+      const newSocket = io(socketUrl, {
         auth: { token }
       });
 
@@ -34,6 +38,11 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       newSocket.on('disconnect', () => {
         console.log('Socket disconnected');
+        setIsConnected(false);
+      });
+
+      newSocket.on('connect_error', (error) => {
+        console.error('Socket connection error:', error);
         setIsConnected(false);
       });
 

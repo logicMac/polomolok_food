@@ -111,7 +111,10 @@ export const createFood = async (req: AuthRequest, res: Response): Promise<void>
       ingredients,
       price, 
       preparationTime,
-      available 
+      available,
+      trackInventory,
+      stock,
+      lowStockThreshold
     } = req.body;
     
     // Check if image was uploaded
@@ -133,6 +136,9 @@ export const createFood = async (req: AuthRequest, res: Response): Promise<void>
       price,
       preparationTime: preparationTime || 30,
       available: available === 'true' || available === true,
+      trackInventory: trackInventory === 'true' || trackInventory === true,
+      stock: stock ? Number(stock) : 0,
+      lowStockThreshold: lowStockThreshold ? Number(lowStockThreshold) : 10,
       image: `/uploads/${req.file.filename}`
     });
 
@@ -167,7 +173,10 @@ export const updateFood = async (req: AuthRequest, res: Response): Promise<void>
       ingredients,
       price, 
       preparationTime,
-      available 
+      available,
+      trackInventory,
+      stock,
+      lowStockThreshold
     } = req.body;
 
     const food = await Food.findById(id);
@@ -189,6 +198,9 @@ export const updateFood = async (req: AuthRequest, res: Response): Promise<void>
     if (price) food.price = price;
     if (preparationTime) food.preparationTime = preparationTime;
     if (available !== undefined) food.available = available === 'true' || available === true;
+    if (trackInventory !== undefined) food.trackInventory = trackInventory === 'true' || trackInventory === true;
+    if (stock !== undefined) food.stock = Number(stock);
+    if (lowStockThreshold !== undefined) food.lowStockThreshold = Number(lowStockThreshold);
 
     // Update image if new one is uploaded
     if (req.file) {

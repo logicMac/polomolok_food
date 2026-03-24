@@ -4,6 +4,7 @@ import api from '../services/api';
 
 interface AuthContextType {
   user: User | null;
+  setUser: (user: User | null) => void;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; message: string; otpSent?: boolean }>;
   verifyOTP: (email: string, otp: string) => Promise<{ success: boolean; message: string }>;
@@ -77,6 +78,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const updateUser = (userData: User | null) => {
+    if (userData) {
+      localStorage.setItem('user', JSON.stringify(userData));
+    }
+    setUser(userData);
+  };
+
   const logout = () => {
     // Call logout endpoint to clear cookies
     api.post('/auth/logout').catch(console.error);
@@ -89,6 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider
       value={{
         user,
+        setUser: updateUser,
         loading,
         login,
         verifyOTP,

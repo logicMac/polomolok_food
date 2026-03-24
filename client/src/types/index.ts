@@ -24,6 +24,9 @@ export interface Food {
   preparationTime?: number;
   image: string;
   available: boolean;
+  stock?: number;
+  lowStockThreshold?: number;
+  trackInventory?: boolean;
   createdAt?: string;
 }
 

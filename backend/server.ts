@@ -22,6 +22,7 @@ import orderRoutes from './src/routes/orderRoutes';
 import userRoutes from './src/routes/userRoutes';
 import chatRoutes from './src/routes/chatRoutes';
 import riderRoutes from './src/routes/riderRoutes';
+import analyticsRoutes from './src/routes/analyticsRoutes';
 
 dotenv.config();
 
@@ -172,6 +173,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/riders', riderRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Serve static files from React app in production
 if (process.env.NODE_ENV === 'production') {

@@ -125,3 +125,100 @@ export const getStatistics = async (req: AuthRequest, res: Response): Promise<vo
     });
   }
 };
+
+export const updateProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+    const { name, phoneNumber, address } = req.body;
+
+    if (!userId) {
+      res.status(401).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+      return;
+    }
+
+    // Validate input
+    if (name && (name.length < 2 || name.length > 50)) {
+      res.status(400).json({
+        success: false,
+        message: 'Name must be between 2 and 50 characters'
+      });
+      return;
+    }
+
+    // Build update object
+    const updateData: any = {};
+    if (name !== undefined) updateData.name = name;
+    if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
+    if (address !== undefined) updateData.address = address;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: user
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update profile',
+      error: error.message
+    });
+  }
+};
+
+export const getMyProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      res.status(401).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+      return;
+    }
+
+    const user = await User.findById(userId).select('-password');
+
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+      return;
+    }
+
+    // Get order count for this user
+    const orderCount = await Order.countDocuments({ userId });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        ...user.toObject(),
+        orderCount
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch profile',
+      error: error.message
+    });
+  }
+};

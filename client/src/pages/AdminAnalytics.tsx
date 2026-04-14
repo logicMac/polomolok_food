@@ -86,6 +86,15 @@ const AdminAnalytics = () => {
   const getImageUrl = (imagePath: string) => {
     if (!imagePath) return '';
     if (imagePath.startsWith('http')) return imagePath;
+    
+    // For production on same domain, use relative path
+    // For development with separate backend, use full URL
+    if ((import.meta as any).env.PROD) {
+      // In production, images are served from same domain
+      return imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    }
+    
+    // Development: construct full URL
     const cleanPath = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
     const apiUrl = (import.meta as any).env.VITE_API_URL || 'http://localhost:5000/api';
     const baseUrl = apiUrl.replace('/api', '');

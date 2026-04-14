@@ -127,35 +127,45 @@ const AdminRiders = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black py-8 sm:py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black relative overflow-hidden py-8 sm:py-12">
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/10 rounded-full filter blur-3xl animate-blob"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-500/10 rounded-full filter blur-3xl animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8 lg:mb-12">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8 lg:mb-12 animate-slide-down">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Riders Management</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent mb-2">Riders Management</h1>
             <p className="text-gray-400 text-sm sm:text-base">Manage your delivery team</p>
           </div>
           <Button 
             onClick={() => openModal()} 
-            className="flex items-center justify-center gap-2 bg-white text-black hover:bg-gray-200 px-6 py-3 rounded-xl font-semibold transition-all hover:scale-105 active:scale-95 shadow-lg"
+            className="relative flex items-center justify-center gap-2 bg-gradient-to-r from-white to-gray-100 text-black hover:from-gray-100 hover:to-white px-6 py-3 rounded-xl font-semibold transition-all hover:scale-105 hover:shadow-2xl hover:shadow-white/20 active:scale-95 shadow-lg overflow-hidden group"
           >
-            <Plus className="w-5 h-5" />
-            Add Rider
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-red-500/0 to-orange-500/0 group-hover:from-orange-500/20 group-hover:via-red-500/20 group-hover:to-orange-500/20 transition-all duration-500"></div>
+            <span className="relative flex items-center gap-2">
+              <Plus className="w-5 h-5" />
+              Add Rider
+            </span>
           </Button>
         </div>
 
         {/* Riders Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in-up animation-delay-200">
           {riders.map((rider) => (
             <div 
               key={rider._id || rider.userId} 
-              className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-all hover:shadow-xl hover:shadow-white/5 group"
+              className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 hover:bg-zinc-900 transition-all duration-300 hover:shadow-xl hover:shadow-white/5 group"
             >
               {/* Header with Avatar and Status */}
               <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center gap-4">
                   <div className="relative">
-                    <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center overflow-hidden ring-2 ring-zinc-800 group-hover:ring-white transition">
+                    <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center overflow-hidden ring-2 ring-zinc-800 group-hover:ring-white group-hover:scale-110 transition-all duration-300 shadow-lg">
                       {rider.image ? (
                         <img
                           src={`http://localhost:5000${rider.image}`}
@@ -260,18 +270,21 @@ const AdminRiders = () => {
 
         {/* Empty State */}
         {riders.length === 0 && (
-          <div className="text-center py-32">
-            <div className="inline-block p-8 bg-zinc-900 border border-zinc-800 rounded-2xl mb-6">
+          <div className="text-center py-32 animate-scale-in">
+            <div className="inline-block p-8 bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-2xl mb-6 hover:scale-110 transition-transform duration-300">
               <Bike className="w-24 h-24 mx-auto text-gray-600" />
             </div>
             <h2 className="text-3xl font-bold mb-3 text-white">No riders yet</h2>
             <p className="text-gray-400 mb-8 text-lg">Add your first rider to start managing deliveries</p>
             <Button 
               onClick={() => openModal()}
-              className="bg-white text-black hover:bg-gray-200 px-8 py-4 rounded-xl font-semibold transition-all hover:scale-105 active:scale-95 shadow-lg inline-flex items-center gap-2"
+              className="relative bg-gradient-to-r from-white to-gray-100 text-black hover:from-gray-100 hover:to-white px-8 py-4 rounded-xl font-semibold transition-all hover:scale-105 hover:shadow-2xl hover:shadow-white/20 active:scale-95 shadow-lg inline-flex items-center gap-2 overflow-hidden group"
             >
-              <Plus className="w-5 h-5" />
-              Add Rider
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-red-500/0 to-orange-500/0 group-hover:from-orange-500/20 group-hover:via-red-500/20 group-hover:to-orange-500/20 transition-all duration-500"></div>
+              <span className="relative flex items-center gap-2">
+                <Plus className="w-5 h-5" />
+                Add Rider
+              </span>
             </Button>
           </div>
         )}

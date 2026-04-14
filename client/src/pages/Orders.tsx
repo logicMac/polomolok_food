@@ -97,36 +97,46 @@ const Orders = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black py-12">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-10">
-          <h1 className="text-4xl font-bold text-white mb-2">My Orders</h1>
+    <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black relative overflow-hidden py-12">
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full filter blur-3xl animate-blob"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-500/10 rounded-full filter blur-3xl animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-10 animate-slide-down">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent mb-2">My Orders</h1>
           <p className="text-gray-400">Track and manage your food orders</p>
         </div>
 
         {orders.length === 0 ? (
-          <div className="text-center py-32 bg-zinc-900 border border-zinc-800 rounded-2xl">
-            <div className="inline-block p-8 bg-black border border-zinc-800 rounded-2xl mb-6">
+          <div className="text-center py-32 bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-2xl animate-scale-in">
+            <div className="inline-block p-8 bg-black/50 backdrop-blur-sm border border-zinc-800 rounded-2xl mb-6 hover:scale-110 transition-transform duration-300">
               <Package className="w-24 h-24 mx-auto text-gray-600" />
             </div>
             <h2 className="text-3xl font-bold mb-3 text-white">No orders yet</h2>
             <p className="text-gray-400 text-lg mb-8">Start ordering delicious food!</p>
             <button
               onClick={() => window.location.href = '/'}
-              className="bg-white text-black px-8 py-4 rounded-xl font-semibold hover:bg-gray-200 transition-all hover:scale-105 active:scale-95 shadow-lg inline-flex items-center gap-2"
+              className="relative bg-gradient-to-r from-white to-gray-100 text-black px-8 py-4 rounded-xl font-semibold hover:from-gray-100 hover:to-white transition-all hover:scale-105 hover:shadow-2xl hover:shadow-white/20 active:scale-95 shadow-lg inline-flex items-center gap-2 overflow-hidden group"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              Browse Menu
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-purple-500/0 to-blue-500/0 group-hover:from-blue-500/20 group-hover:via-purple-500/20 group-hover:to-blue-500/20 transition-all duration-500"></div>
+              <span className="relative flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                Browse Menu
+              </span>
             </button>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-fade-in-up animation-delay-200">
             {orders.map((order, index) => (
               <div 
                 key={order._id} 
-                className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-all animate-fade-in"
+                className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 hover:bg-zinc-900 transition-all duration-300 animate-fade-in"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
@@ -193,10 +203,13 @@ const Orders = () => {
                   {!['delivered', 'cancelled'].includes(order.status) && (
                     <button
                       onClick={() => setSelectedOrder(order._id)}
-                      className="w-full flex items-center justify-center gap-2 bg-white text-black py-4 px-6 rounded-xl hover:bg-gray-200 transition-all hover:scale-105 active:scale-95 font-bold text-lg shadow-lg"
+                      className="relative w-full flex items-center justify-center gap-2 bg-gradient-to-r from-white to-gray-100 text-black py-4 px-6 rounded-xl hover:from-gray-100 hover:to-white transition-all hover:scale-105 hover:shadow-2xl hover:shadow-white/20 active:scale-95 font-bold text-lg shadow-lg overflow-hidden group"
                     >
-                      <Eye className="w-5 h-5" />
-                      Track Order Live
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-purple-500/0 to-blue-500/0 group-hover:from-blue-500/20 group-hover:via-purple-500/20 group-hover:to-blue-500/20 transition-all duration-500"></div>
+                      <span className="relative flex items-center gap-2">
+                        <Eye className="w-5 h-5" />
+                        Track Order Live
+                      </span>
                     </button>
                   )}
                 </div>

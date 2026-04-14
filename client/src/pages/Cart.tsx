@@ -119,24 +119,31 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black py-12">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Shopping Cart</h1>
+    <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black relative overflow-hidden py-12">
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500/10 rounded-full filter blur-3xl animate-blob"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full filter blur-3xl animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 animate-slide-down">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent mb-2">Shopping Cart</h1>
           <p className="text-gray-400">{cart.length} {cart.length === 1 ? 'item' : 'items'} in your cart</p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-8 animate-fade-in-up animation-delay-200">
           <div className="lg:col-span-2 space-y-4">
             {cart.map((item) => (
               <div
                 key={item.food._id}
-                className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 flex items-center gap-4 hover:border-zinc-700 transition group"
+                className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-xl p-5 flex items-center gap-4 hover:border-zinc-700 hover:bg-zinc-900 transition-all duration-300 group"
               >
                 <img
                   src={`http://localhost:5000${item.food.image}`}
                   alt={item.food.name}
-                  className="w-28 h-28 object-cover rounded-lg group-hover:scale-105 transition-transform"
+                  className="w-28 h-28 object-cover rounded-lg group-hover:scale-110 transition-transform duration-300 shadow-lg"
                 />
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-lg text-white mb-1 truncate">{item.food.name}</h3>
@@ -169,7 +176,7 @@ const Cart = () => {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 sticky top-24">
+            <div className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-xl p-6 sticky top-24 hover:border-zinc-700 transition-all duration-300">
               <h2 className="text-2xl font-bold mb-6 text-white">Order Summary</h2>
               
               <div className="space-y-3 mb-6 pb-6 border-b border-zinc-800">
@@ -294,19 +301,22 @@ const Cart = () => {
                 <button
                   type="submit"
                   disabled={loading || !recaptchaToken}
-                  className="w-full bg-white text-black py-4 rounded-xl font-bold text-lg hover:bg-gray-200 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg"
+                  className="relative w-full bg-gradient-to-r from-white to-gray-100 text-black py-4 rounded-xl font-bold text-lg hover:from-gray-100 hover:to-white transition-all hover:scale-105 hover:shadow-2xl hover:shadow-white/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg overflow-hidden group"
                 >
-                  {loading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Placing Order...
-                    </span>
-                  ) : (
-                    'Place Order'
-                  )}
+                  <div className="absolute inset-0 bg-gradient-to-r from-green-500/0 via-emerald-500/0 to-green-500/0 group-hover:from-green-500/20 group-hover:via-emerald-500/20 group-hover:to-green-500/20 transition-all duration-500"></div>
+                  <span className="relative">
+                    {loading ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Placing Order...
+                      </span>
+                    ) : (
+                      'Place Order'
+                    )}
+                  </span>
                 </button>
               </form>
             </div>

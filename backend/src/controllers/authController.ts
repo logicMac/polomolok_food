@@ -5,6 +5,8 @@ import { generateAccessToken, generateRefreshToken, generateOTP, verifyToken } f
 import { sendOTPEmail } from '../utils/emailService';
 import { AuthRequest } from '../types';
 import { securityLogger } from '../config/logger';
+import { logAuth } from '../utils/activityLogger';
+import { trackFailedLogin, clearFailedAttempts } from '../middlewares/ipBlocker';
 
 // Helper to get client IP
 const getClientIp = (req: Request): string => {
@@ -89,6 +91,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     // Log successful registration
     securityLogger.logRegistration(user._id.toString(), email, clientIp);
+    await logAuth.register(req, email, 'success');
 
     res.status(201).json({
       success: true,
@@ -102,6 +105,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     });
   } catch (error: any) {
     console.error('Registration error:', error);
+    await logAuth.register(req, req.body.email, 'failure', error.message);
     // Generic error message - don't expose internal details
     res.status(500).json({
       success: false,
@@ -122,6 +126,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     if (!user) {
       // Generic message - don't reveal if email exists
       securityLogger.logFailedLogin(email, clientIp, 'User not found');
+      await logAuth.login(req, email, 'failure', 'User not found');
+      await trackFailedLogin(clientIp);
       res.status(401).json({
         success: false,
         message: 'Invalid credentials. Please check your email and password.'
@@ -133,6 +139,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     if (user.lockUntil && user.lockUntil > new Date()) {
       const remainingTime = Math.ceil((user.lockUntil.getTime() - Date.now()) / 1000 / 60);
       securityLogger.logFailedLogin(email, clientIp, 'Account locked');
+      await logAuth.accountLocked(req, email);
       res.status(423).json({
         success: false,
         message: `Account is temporarily locked. Please try again in ${remainingTime} minute(s).`,
@@ -150,6 +157,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       const attemptsLeft = 5 - (updatedUser?.loginAttempts || 0);
       
       securityLogger.logFailedLogin(email, clientIp, 'Invalid password');
+      await logAuth.login(req, email, 'failure', 'Invalid password');
+      await trackFailedLogin(clientIp);
       
       res.status(401).json({
         success: false,
@@ -178,6 +187,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       });
       return;
     }
+
+    await logAuth.otpSent(req, email);
 
     res.status(200).json({
       success: true,
@@ -234,6 +245,8 @@ export const verifyOTP = async (req: Request, res: Response): Promise<void> => {
     // Verify OTP
     if (user.otp !== otp) {
       securityLogger.logFailedLogin(email, clientIp, 'Invalid OTP');
+      await logAuth.otpVerified(req, email, 'failure');
+      await trackFailedLogin(clientIp);
       res.status(401).json({
         success: false,
         message: 'Invalid verification code'
@@ -277,6 +290,9 @@ export const verifyOTP = async (req: Request, res: Response): Promise<void> => {
 
     // Log successful login
     securityLogger.logSuccessfulLogin(user._id.toString(), email, clientIp);
+    await logAuth.otpVerified(req, email, 'success');
+    await logAuth.login(req, email, 'success');
+    clearFailedAttempts(clientIp);
 
     const userData: any = {
       userId: user._id,
@@ -393,8 +409,13 @@ export const getProfile = async (req: AuthRequest, res: Response): Promise<void>
   }
 };
 
-export const logout = async (req: Request, res: Response): Promise<void> => {
+export const logout = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    // Log logout activity
+    if (req.user) {
+      await logAuth.logout(req);
+    }
+
     // Clear cookies
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');

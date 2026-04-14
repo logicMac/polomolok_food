@@ -148,17 +148,24 @@ const RiderDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-black py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black relative overflow-hidden py-8">
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/10 rounded-full filter blur-3xl animate-blob"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full filter blur-3xl animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Rider Dashboard</h1>
+        <div className="mb-8 animate-slide-down">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent mb-2">Rider Dashboard</h1>
           <p className="text-gray-400">Welcome back, {user?.name}</p>
         </div>
 
         {/* Controls */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 animate-fade-in-up animation-delay-200">
+          <div className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-all duration-300">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm mb-1">Status</p>
@@ -169,7 +176,7 @@ const RiderDashboard = () => {
               <Button
                 onClick={toggleAvailability}
                 variant={isAvailable ? 'destructive' : 'default'}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 hover:scale-105 transition-transform"
               >
                 <Power className="w-4 h-4" />
                 {isAvailable ? 'Go Offline' : 'Go Online'}
@@ -177,21 +184,23 @@ const RiderDashboard = () => {
             </div>
           </div>
 
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
+          <div className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-all duration-300 group">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm mb-1">Active Deliveries</p>
                 <p className="text-2xl font-bold text-white">{activeDeliveries.length}</p>
               </div>
-              <Package className="w-8 h-8 text-orange-500" />
+              <div className="p-3 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Package className="w-8 h-8 text-white" />
+              </div>
             </div>
           </div>
 
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
+          <div className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-all duration-300">
             <Button
               onClick={updateLocation}
               disabled={updatingLocation}
-              className="w-full flex items-center justify-center gap-2"
+              className="w-full flex items-center justify-center gap-2 hover:scale-105 transition-transform"
             >
               <Navigation className="w-4 h-4" />
               {updatingLocation ? 'Updating...' : 'Update Location'}
@@ -201,11 +210,15 @@ const RiderDashboard = () => {
 
         {/* Active Deliveries */}
         {activeDeliveries.length > 0 && (
-          <div className="mb-8">
+          <div className="mb-8 animate-fade-in animation-delay-400">
             <h2 className="text-2xl font-bold text-white mb-4">Active Deliveries</h2>
             <div className="space-y-4">
-              {activeDeliveries.map((order) => (
-                <div key={order._id} className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
+              {activeDeliveries.map((order, index) => (
+                <div 
+                  key={order._id} 
+                  className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 hover:bg-zinc-900 transition-all duration-300"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <h3 className="text-lg font-semibold text-white mb-1">
@@ -250,10 +263,13 @@ const RiderDashboard = () => {
                   {getNextStatus(order.status) && (
                     <Button
                       onClick={() => updateStatus(order._id, getNextStatus(order.status)!)}
-                      className="w-full flex items-center justify-center gap-2"
+                      className="relative w-full flex items-center justify-center gap-2 overflow-hidden group hover:scale-105 transition-transform"
                     >
-                      <CheckCircle className="w-4 h-4" />
-                      Mark as {getNextStatus(order.status)?.replace('-', ' ')}
+                      <div className="absolute inset-0 bg-gradient-to-r from-green-500/0 via-emerald-500/0 to-green-500/0 group-hover:from-green-500/20 group-hover:via-emerald-500/20 group-hover:to-green-500/20 transition-all duration-500"></div>
+                      <span className="relative flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4" />
+                        Mark as {getNextStatus(order.status)?.replace('-', ' ')}
+                      </span>
                     </Button>
                   )}
                 </div>
@@ -264,11 +280,15 @@ const RiderDashboard = () => {
 
         {/* Completed Deliveries */}
         {completedDeliveries.length > 0 && (
-          <div>
+          <div className="animate-fade-in animation-delay-600">
             <h2 className="text-2xl font-bold text-white mb-4">Completed Deliveries</h2>
             <div className="space-y-4">
-              {completedDeliveries.map((order) => (
-                <div key={order._id} className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 opacity-60">
+              {completedDeliveries.map((order, index) => (
+                <div 
+                  key={order._id} 
+                  className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-xl p-6 opacity-60 hover:opacity-80 transition-all duration-300"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="text-lg font-semibold text-white mb-1">
@@ -287,8 +307,10 @@ const RiderDashboard = () => {
         )}
 
         {deliveries.length === 0 && (
-          <div className="text-center py-20">
-            <Package className="w-24 h-24 mx-auto mb-4 text-gray-600" />
+          <div className="text-center py-20 bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-2xl animate-scale-in">
+            <div className="inline-block p-8 bg-black/50 backdrop-blur-sm border border-zinc-800 rounded-2xl mb-6 hover:scale-110 transition-transform duration-300">
+              <Package className="w-24 h-24 mx-auto text-gray-600" />
+            </div>
             <h2 className="text-2xl font-bold mb-2 text-white">No deliveries yet</h2>
             <p className="text-gray-400">
               {isAvailable 

@@ -149,19 +149,28 @@ const Login = () => {
   }, [isLocked, lockTimeRemaining]);  
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
+    <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden">
+      {/* Animated Background Blobs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -left-40 w-80 h-80 bg-purple-500/20 rounded-full filter blur-3xl animate-blob"></div>
+        <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-blue-500/20 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-500/20 rounded-full filter blur-3xl animate-blob animation-delay-4000"></div>
+      </div>
+
       {/* Left Side - Form */}
-      <div className="w-full lg:w-1/2 bg-black flex items-center justify-center p-4 sm:p-8 lg:p-12">
-        <div className="w-full max-w-md">
+      <div className="w-full lg:w-1/2 bg-black flex items-center justify-center p-4 sm:p-8 lg:p-12 relative z-10 min-h-screen lg:min-h-0">
+        <div className="w-full max-w-md animate-fade-in-up my-auto">
           {/* Logo/Brand */}
-          <div className="mb-8 lg:mb-12 text-center lg:text-left">
+          <div className="mb-8 lg:mb-12 text-center lg:text-left animate-slide-down">
             <div className="inline-flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-white to-gray-200 rounded-lg flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-300">
                 <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white">Food Order</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
+                Food Order
+              </h1>
             </div>
             <p className="text-gray-400 text-sm sm:text-base">Polomolok's finest delivery</p>
           </div>
@@ -169,40 +178,40 @@ const Login = () => {
           {!showOTP ? (
             <>
               {/* Login Form */}
-              <div className="mb-6 lg:mb-8 text-center lg:text-left">
+              <div className="mb-6 lg:mb-8 text-center lg:text-left animate-fade-in animation-delay-200">
                 <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">Welcome back</h2>
                 <p className="text-gray-400 text-sm sm:text-base">Please enter your details to sign in</p>
               </div>
 
-              <form onSubmit={handleLogin} className="space-y-4 sm:space-y-5">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+              <form onSubmit={handleLogin} className="space-y-4 sm:space-y-5 animate-fade-in animation-delay-400">
+                <div className="group">
+                  <label className="block text-sm font-medium text-gray-300 mb-2 transition-colors group-focus-within:text-white">
                     Email
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 transition-colors group-focus-within:text-white" />
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-11 pr-4 py-3 sm:py-3.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition text-sm sm:text-base"
+                      className="w-full bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-xl pl-11 pr-4 py-3 sm:py-3.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent focus:bg-zinc-900 transition-all duration-300 text-sm sm:text-base hover:border-zinc-700"
                       placeholder="your@email.com"
                       required
                     />
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                <div className="group">
+                  <label className="block text-sm font-medium text-gray-300 mb-2 transition-colors group-focus-within:text-white">
                     Password
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 transition-colors group-focus-within:text-white" />
                     <input
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-11 pr-4 py-3 sm:py-3.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition text-sm sm:text-base"
+                      className="w-full bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-xl pl-11 pr-4 py-3 sm:py-3.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent focus:bg-zinc-900 transition-all duration-300 text-sm sm:text-base hover:border-zinc-700"
                       placeholder="••••••••"
                       required
                     />
@@ -240,19 +249,22 @@ const Login = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-white text-black font-semibold rounded-xl py-3 sm:py-3.5 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 shadow-lg text-sm sm:text-base"
+                  className="relative w-full bg-gradient-to-r from-white to-gray-100 text-black font-semibold rounded-xl py-3 sm:py-3.5 hover:from-gray-100 hover:to-white transition-all hover:scale-105 hover:shadow-2xl hover:shadow-white/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 shadow-lg text-sm sm:text-base overflow-hidden group"
                 >
-                  {loading ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      Sign In
-                      <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
-                    </>
-                  )}
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-blue-500/0 to-purple-500/0 group-hover:from-purple-500/20 group-hover:via-blue-500/20 group-hover:to-purple-500/20 transition-all duration-500"></div>
+                  <span className="relative flex items-center gap-2">
+                    {loading ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        Sign In
+                        <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
+                  </span>
                 </button>
               </form>
 
@@ -266,8 +278,8 @@ const Login = () => {
           ) : (
             <>
               {/* OTP Verification */}
-              <div className="mb-6 sm:mb-8 text-center">
-                <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-zinc-900 rounded-full mb-4 border border-zinc-800">
+              <div className="mb-6 sm:mb-8 text-center animate-scale-in">
+                <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-full mb-4 border border-zinc-700 shadow-lg animate-pulse-slow">
                   <Shield className="h-7 w-7 sm:h-8 sm:w-8 text-white" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">Verify OTP</h2>
@@ -280,16 +292,16 @@ const Login = () => {
                 </div>
               )}
 
-              <form onSubmit={handleVerifyOTP} className="space-y-4 sm:space-y-5" onReset={(e) => e.preventDefault()}>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2 text-center">
+              <form onSubmit={handleVerifyOTP} className="space-y-4 sm:space-y-5 animate-fade-in" onReset={(e) => e.preventDefault()}>
+                <div className="group">
+                  <label className="block text-sm font-medium text-gray-300 mb-2 text-center transition-colors group-focus-within:text-white">
                     OTP Code
                   </label>
                   <input
                     type="text"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 sm:py-4 text-white text-center text-xl sm:text-2xl font-bold tracking-[0.5em] placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-xl px-4 py-3 sm:py-4 text-white text-center text-xl sm:text-2xl font-bold tracking-[0.5em] placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent focus:bg-zinc-900 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:border-zinc-700"
                     placeholder="000000"
                     maxLength={6}
                     disabled={isLocked}
@@ -329,18 +341,21 @@ const Login = () => {
                 <button
                   type="submit"
                   disabled={loading || otp.length !== 6 || isLocked}
-                  className="w-full bg-white text-black font-semibold rounded-xl py-3 sm:py-3.5 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 shadow-lg text-sm sm:text-base"
+                  className="relative w-full bg-gradient-to-r from-white to-gray-100 text-black font-semibold rounded-xl py-3 sm:py-3.5 hover:from-gray-100 hover:to-white transition-all hover:scale-105 hover:shadow-2xl hover:shadow-white/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 shadow-lg text-sm sm:text-base overflow-hidden group"
                 >
-                  {loading ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-                      Verifying...
-                    </>
-                  ) : isLocked ? (
-                    'Account Locked'
-                  ) : (
-                    'Verify OTP'
-                  )}
+                  <div className="absolute inset-0 bg-gradient-to-r from-green-500/0 via-emerald-500/0 to-green-500/0 group-hover:from-green-500/20 group-hover:via-emerald-500/20 group-hover:to-green-500/20 transition-all duration-500"></div>
+                  <span className="relative">
+                    {loading ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin inline-block mr-2"></div>
+                        Verifying...
+                      </>
+                    ) : isLocked ? (
+                      'Account Locked'
+                    ) : (
+                      'Verify OTP'
+                    )}
+                  </span>
                 </button>
 
                 <button
@@ -353,7 +368,7 @@ const Login = () => {
                     setOtpAttempts(0);
                     setRateLimitRemaining(null);
                   }}
-                  className="w-full bg-zinc-900 text-white font-medium rounded-xl py-3 sm:py-3.5 hover:bg-zinc-800 transition border border-zinc-800 text-sm sm:text-base"
+                  className="w-full bg-zinc-900/50 backdrop-blur-sm text-white font-medium rounded-xl py-3 sm:py-3.5 hover:bg-zinc-800 transition-all border border-zinc-800 text-sm sm:text-base hover:border-zinc-700 hover:scale-105 active:scale-95"
                 >
                   Back to login
                 </button>
@@ -366,7 +381,7 @@ const Login = () => {
       {/* Right Side - Background Image */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         <div 
-          className="absolute inset-0"
+          className="absolute inset-0 transition-transform duration-700 hover:scale-105"
           style={{
             backgroundImage: 'url(https://www.foodiv.com/wp-content/uploads/2023/06/online-ordering-business.jpg)',
             backgroundSize: 'cover',
@@ -378,9 +393,9 @@ const Login = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70"></div>
         </div>
         <div className="absolute inset-0 flex items-center justify-center p-12">
-          <div className="text-center relative z-10 max-w-lg">
-            <div className="mb-8 animate-fade-in">
-              <div className="inline-block p-5 bg-white/10 rounded-3xl backdrop-blur-sm border border-white/20">
+          <div className="text-center relative z-10 max-w-lg animate-fade-in-up animation-delay-400">
+            <div className="mb-8">
+              <div className="inline-block p-5 bg-white/10 rounded-3xl backdrop-blur-sm border border-white/20 hover:bg-white/20 hover:scale-110 transition-all duration-500 shadow-2xl">
                 <svg className="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
@@ -393,10 +408,10 @@ const Login = () => {
               Fast delivery, fresh ingredients, and delicious meals delivered right to your door in Polomolok
             </p>
             <div className="mt-10 flex flex-wrap justify-center gap-4">
-              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-3">
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-3 hover:bg-white/20 hover:scale-105 transition-all duration-300 cursor-default">
                 <p className="text-white font-semibold">⚡ Fast Delivery</p>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-3">
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-3 hover:bg-white/20 hover:scale-105 transition-all duration-300 cursor-default">
                 <p className="text-white font-semibold">🎯 Track Orders</p>
               </div>
             </div>

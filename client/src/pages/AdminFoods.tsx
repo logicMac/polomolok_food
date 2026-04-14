@@ -145,50 +145,80 @@ const AdminFoods = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-white">Manage Foods</h1>
+    <div className="min-h-screen bg-black py-8 relative overflow-hidden">
+      {/* Animated Background Blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl animate-blob"></div>
+        <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-red-500/10 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="flex justify-between items-center mb-8 animate-fadeInUp">
+          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-red-400 to-yellow-400">
+            Manage Foods
+          </h1>
           <button
             onClick={() => setShowModal(true)}
-            className="bg-white text-black px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-gray-200 transition font-semibold"
+            className="relative px-6 py-3 rounded-xl font-semibold text-white overflow-hidden group transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-orange-500/50"
           >
-            <Plus className="w-5 h-5" />
-            <span>Add Food</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-red-600 transition-all duration-300"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+            <div className="relative flex items-center space-x-2">
+              <Plus className="w-5 h-5" />
+              <span>Add Food</span>
+            </div>
           </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {foods.map((food) => (
-            <div key={food._id} className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition">
-              <img 
-                src={getImageUrl(food.image)} 
-                alt={food.name} 
-                className="w-full h-48 object-cover"
-                onError={(e) => {
-                  e.currentTarget.src = 'https://via.placeholder.com/400x300?text=No+Image';
-                }}
-              />
+          {foods.map((food, index) => (
+            <div 
+              key={food._id} 
+              className="bg-gradient-to-br from-zinc-900/80 to-zinc-800/80 backdrop-blur-xl border border-zinc-700/50 rounded-2xl overflow-hidden hover:border-orange-500/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/20 animate-fadeInUp"
+              style={{ animationDelay: `${(index + 2) * 100}ms` }}
+            >
+              <div className="relative overflow-hidden group">
+                <img 
+                  src={getImageUrl(food.image)} 
+                  alt={food.name} 
+                  className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+                  onError={(e) => {
+                    e.currentTarget.src = 'https://via.placeholder.com/400x300?text=No+Image';
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
               <div className="p-4">
                 <h3 className="font-bold text-lg mb-2 text-white">{food.name}</h3>
                 <p className="text-sm text-gray-400 mb-2 line-clamp-2">{food.description}</p>
                 <div className="flex justify-between items-center mb-4">
-                  <span className="font-bold text-white">₱{food.price.toFixed(2)}</span>
-                  <span className={`text-xs px-2 py-1 rounded-lg font-medium ${food.available ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                  <span className="font-bold text-xl text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-400">
+                    ₱{food.price.toFixed(2)}
+                  </span>
+                  <span className={`text-xs px-3 py-1 rounded-lg font-medium transition-all duration-300 ${
+                    food.available 
+                      ? 'bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-300 border border-green-500/50 shadow-lg shadow-green-500/20' 
+                      : 'bg-gradient-to-r from-red-500/20 to-rose-500/20 text-red-300 border border-red-500/50 shadow-lg shadow-red-500/20'
+                  }`}>
                     {food.available ? 'Available' : 'Unavailable'}
                   </span>
                 </div>
                 <div className="flex space-x-2">
                   <button
                     onClick={() => handleEdit(food)}
-                    className="flex-1 bg-white text-black py-2 rounded-lg hover:bg-gray-200 transition flex items-center justify-center space-x-1 font-medium"
+                    className="flex-1 relative py-2 rounded-lg font-medium overflow-hidden group transition-all duration-300 hover:scale-105"
                   >
-                    <Edit className="w-4 h-4" />
-                    <span>Edit</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+                    <div className="relative flex items-center justify-center space-x-1 text-white">
+                      <Edit className="w-4 h-4" />
+                      <span>Edit</span>
+                    </div>
                   </button>
                   <button
                     onClick={() => handleDelete(food._id)}
-                    className="flex-1 bg-red-500/10 text-red-400 border border-red-500/50 py-2 rounded-lg hover:bg-red-500/20 transition flex items-center justify-center space-x-1 font-medium"
+                    className="flex-1 bg-gradient-to-r from-red-500/20 to-rose-500/20 text-red-300 border border-red-500/50 py-2 rounded-lg hover:from-red-500/30 hover:to-rose-500/30 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-1 font-medium shadow-lg shadow-red-500/20"
                   >
                     <Trash2 className="w-4 h-4" />
                     <span>Delete</span>
@@ -200,13 +230,13 @@ const AdminFoods = () => {
         </div>
 
         {showModal && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+            <div className="bg-gradient-to-br from-zinc-900 to-zinc-800 border border-zinc-700 rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-scaleIn">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold text-white">
+                <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-400">
                   {editingFood ? 'Edit Food' : 'Add New Food'}
                 </h2>
-                <button onClick={resetForm} className="text-gray-400 hover:text-white">
+                <button onClick={resetForm} className="text-gray-400 hover:text-white transition-colors hover:rotate-90 duration-300">
                   <X className="w-6 h-6" />
                 </button>
               </div>
@@ -217,7 +247,7 @@ const AdminFoods = () => {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                     required
                   />
                 </div>
@@ -226,7 +256,7 @@ const AdminFoods = () => {
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                     rows={3}
                     required
                   />
@@ -236,7 +266,7 @@ const AdminFoods = () => {
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                   >
                     <option>Appetizer</option>
                     <option>Main Course</option>
@@ -252,7 +282,7 @@ const AdminFoods = () => {
                     step="0.01"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                     required
                   />
                 </div>
@@ -260,14 +290,14 @@ const AdminFoods = () => {
                   <label className="block text-sm font-medium mb-2 text-gray-300">Food Image</label>
                   {imagePreview && (
                     <div className="mb-3">
-                      <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
+                      <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover rounded-lg border border-zinc-700" />
                     </div>
                   )}
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handleImageChange}
-                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white file:text-black hover:file:bg-gray-200 transition"
+                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-orange-600 file:to-red-600 file:text-white hover:file:from-orange-500 hover:file:to-red-500 transition"
                     required={!editingFood}
                   />
                   <p className="text-xs text-gray-400 mt-1">Max size: 5MB. Formats: JPG, PNG, GIF, WebP</p>
@@ -277,7 +307,7 @@ const AdminFoods = () => {
                     type="checkbox"
                     checked={formData.available}
                     onChange={(e) => setFormData({ ...formData, available: e.target.checked })}
-                    className="w-4 h-4 rounded"
+                    className="w-4 h-4 rounded accent-orange-500"
                   />
                   <label className="text-sm font-medium text-gray-300">Available</label>
                 </div>
@@ -286,7 +316,7 @@ const AdminFoods = () => {
                     type="checkbox"
                     checked={formData.trackInventory}
                     onChange={(e) => setFormData({ ...formData, trackInventory: e.target.checked })}
-                    className="w-4 h-4 rounded"
+                    className="w-4 h-4 rounded accent-orange-500"
                   />
                   <label className="text-sm font-medium text-gray-300">Track Inventory</label>
                 </div>
@@ -298,7 +328,7 @@ const AdminFoods = () => {
                         type="number"
                         value={formData.stock}
                         onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                        className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                        className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                         min="0"
                       />
                     </div>
@@ -308,7 +338,7 @@ const AdminFoods = () => {
                         type="number"
                         value={formData.lowStockThreshold}
                         onChange={(e) => setFormData({ ...formData, lowStockThreshold: e.target.value })}
-                        className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                        className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                         min="0"
                       />
                       <p className="text-xs text-gray-400 mt-1">Alert when stock falls below this number</p>
@@ -318,14 +348,16 @@ const AdminFoods = () => {
                 <div className="flex space-x-2 pt-2">
                   <button
                     type="submit"
-                    className="flex-1 bg-white text-black py-3 rounded-lg hover:bg-gray-200 transition font-semibold"
+                    className="flex-1 relative py-3 rounded-lg font-semibold overflow-hidden group transition-all duration-300 hover:scale-105"
                   >
-                    {editingFood ? 'Update' : 'Create'}
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-red-600"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+                    <span className="relative text-white">{editingFood ? 'Update' : 'Create'}</span>
                   </button>
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="flex-1 border border-zinc-700 text-white py-3 rounded-lg hover:bg-zinc-800 transition font-medium"
+                    className="flex-1 border border-zinc-700 text-white py-3 rounded-lg hover:bg-zinc-800 transition-all duration-300 font-medium"
                   >
                     Cancel
                   </button>

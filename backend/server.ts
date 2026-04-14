@@ -12,6 +12,7 @@ import { createServer } from 'http';
 import connectDB from './db';
 import { apiLimiter } from './src/middlewares/rateLimiter';
 import { getCsrfToken, verifyCsrfToken } from './src/middlewares/csrf';
+import { checkBlockedIP } from './src/middlewares/ipBlocker';
 import logger from './src/config/logger';
 import { initializeSocket } from './src/config/socket';
 
@@ -23,6 +24,7 @@ import userRoutes from './src/routes/userRoutes';
 import chatRoutes from './src/routes/chatRoutes';
 import riderRoutes from './src/routes/riderRoutes';
 import analyticsRoutes from './src/routes/analyticsRoutes';
+import securityRoutes from './src/routes/securityRoutes';
 
 dotenv.config();
 
@@ -157,6 +159,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// IP blocking check (before rate limiting)
+app.use(checkBlockedIP);
+
 // Rate limiting
 app.use('/api', apiLimiter);
 
@@ -174,6 +179,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/riders', riderRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/security', securityRoutes);
 
 // Serve static files from React app in production
 if (process.env.NODE_ENV === 'production') {

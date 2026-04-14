@@ -16,6 +16,7 @@ import AdminOrders from './pages/AdminOrders';
 import AdminUsers from './pages/AdminUsers';
 import AdminRiders from './pages/AdminRiders';
 import AdminAnalytics from './pages/AdminAnalytics';
+import AdminSecurity from './pages/AdminSecurity';
 import RiderDashboard from './pages/RiderDashboard';
 
 function App() {
@@ -101,6 +102,14 @@ function App() {
                   element={
                     <ProtectedRoute adminOnly>
                       <AdminAnalytics />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/security"
+                  element={
+                    <ProtectedRoute adminOnly>
+                      <AdminSecurity />
                     </ProtectedRoute>
                   }
                 />

@@ -292,24 +292,24 @@ const AdminDashboard = () => {
 
           <Link
             to="/admin/analytics"
-            className="group relative bg-gradient-to-br from-white to-gray-100 border-2 border-white rounded-2xl p-8 hover:shadow-2xl hover:shadow-white/20 hover:scale-105 transition-all duration-500 md:col-span-2 lg:col-span-1 overflow-hidden"
+            className="group relative bg-gradient-to-br from-zinc-900 to-zinc-800 border border-zinc-700/50 rounded-2xl p-8 hover:border-yellow-500/50 hover:shadow-2xl hover:shadow-yellow-500/20 transition-all duration-500 md:col-span-2 lg:col-span-1 overflow-hidden"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/0 to-amber-400/0 group-hover:from-yellow-400/10 group-hover:to-amber-400/10 transition-all duration-500"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-600/0 to-amber-600/0 group-hover:from-yellow-600/10 group-hover:to-amber-600/10 transition-all duration-500"></div>
             <div className="relative">
               <div className="flex items-start justify-between mb-6">
                 <div className="p-4 bg-gradient-to-br from-yellow-500 to-amber-500 rounded-2xl shadow-lg group-hover:shadow-yellow-500/50 group-hover:scale-110 transition-all duration-300">
                   <BarChart3 className="w-8 h-8 text-white" />
                 </div>
-                <ArrowRight className="w-6 h-6 text-gray-400 group-hover:text-yellow-600 group-hover:translate-x-2 transition-all duration-300" />
+                <ArrowRight className="w-6 h-6 text-zinc-600 group-hover:text-yellow-400 group-hover:translate-x-2 transition-all duration-300" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-yellow-600 transition-colors">
+              <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-yellow-400 transition-colors">
                 Analytics & Inventory
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed mb-4">View detailed sales analytics, revenue trends, and manage inventory levels</p>
+              <p className="text-gray-400 text-sm leading-relaxed mb-4">View detailed sales analytics, revenue trends, and manage inventory levels</p>
               <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1.5 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium">Revenue Tracking</span>
-                <span className="px-3 py-1.5 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">Stock Management</span>
-                <span className="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">Reports</span>
+                <span className="px-3 py-1.5 bg-yellow-500/20 text-yellow-300 rounded-full text-xs font-medium">Revenue Tracking</span>
+                <span className="px-3 py-1.5 bg-amber-500/20 text-amber-300 rounded-full text-xs font-medium">Stock Management</span>
+                <span className="px-3 py-1.5 bg-orange-500/20 text-orange-300 rounded-full text-xs font-medium">Reports</span>
               </div>
             </div>
           </Link>

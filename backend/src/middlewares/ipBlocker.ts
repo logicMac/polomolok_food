@@ -17,6 +17,14 @@ setInterval(async () => {
   }
 }, CACHE_TTL);
 
+// Whitelist for IPs that should never be blocked (localhost, testing)
+const WHITELISTED_IPS = [
+  '127.0.0.1',
+  '::1',
+  '::ffff:127.0.0.1',
+  'localhost'
+];
+
 export const checkBlockedIP = async (
   req: Request,
   res: Response,
@@ -24,6 +32,11 @@ export const checkBlockedIP = async (
 ): Promise<void> => {
   try {
     const clientIp = getClientIp(req);
+
+    // Skip blocking for whitelisted IPs (localhost, testing)
+    if (WHITELISTED_IPS.includes(clientIp)) {
+      return next();
+    }
 
     // Check cache first
     if (blockedIPCache.has(clientIp)) {

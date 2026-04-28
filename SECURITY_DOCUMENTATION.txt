@@ -1,0 +1,389 @@
+Information Security Features Documentation
+Polomolok Food Ordering System
+
+Prepared by:
+[Full Name 1]
+[Full Name 2]
+[Full Name 3]
+[Full Name 4]
+[Full Name 5]
+
+[Month, Year]
+
+
+INTRODUCTION
+
+This system is designed to provide a secure online food ordering platform for Polomolok residents. It is used by three types of users: customers who order food, delivery riders who fulfill orders, and administrators who manage the entire system. The system handles sensitive data such as personal information (names, emails, addresses, phone numbers), authentication credentials (passwords, OTP codes), payment transactions, order details, and real-time location data for delivery tracking. To protect this data, several comprehensive security features are implemented to prevent unauthorized access, data breaches, account takeover, injection attacks, cross-site scripting, denial of service attacks, and data loss.
+
+
+SYSTEM USERS AND ACCESS CONTROL
+
+The system implements a three-tier role-based access control system with distinct permissions for each user type:
+
+Admin:
+Full system access with complete control over all resources. Administrators can manage all food items (create, read, update, delete), view and modify all orders regardless of customer, access all user accounts and modify user roles, view comprehensive system analytics and statistics, access security monitoring dashboard with activity logs, manage IP blocking and unblocking, view all chat support conversations, manage delivery riders (approve, suspend, assign), and access system logs and audit trails. Admins have unrestricted access to all API endpoints and can perform any operation within the system.
+
+Customer:
+Limited access focused on ordering functionality. Customers can browse the food menu and view item details, add items to shopping cart and manage cart contents, place new orders and track order status, view their own order history only, update their personal profile information, initiate chat support conversations with admin, cancel their own pending orders, and view their account activity. Customers cannot access other users' data, modify food items, change order statuses, or access administrative functions.
+
+Rider:
+Specialized access for delivery operations. Riders can view orders assigned to them, update delivery status and location in real-time, mark orders as delivered, view their delivery history and statistics, update their availability status, manage their profile and vehicle information, and communicate with customers regarding deliveries. Riders cannot access other riders' assignments, modify food items, access customer personal data beyond delivery requirements, or perform administrative functions.
+
+Access Control Implementation:
+The system enforces access control through multiple layers of security. JWT (JSON Web Token) based authentication verifies user identity on every request. Role-based authorization middleware checks user roles before granting access to protected routes. Each API endpoint is protected with authentication middleware that validates the JWT token from the request. Authorization middleware then verifies if the authenticated user has the required role to access the specific resource. Protected routes on the frontend prevent unauthorized navigation. The system uses HTTP-only cookies for token storage to prevent XSS attacks. Session management includes automatic token expiration (15 minutes for access tokens, 7 days for refresh tokens) and automatic token refresh mechanism. All sensitive operations require valid authentication and appropriate role permissions.
+
+
+IMPLEMENTED SECURITY FEATURES
+
+1. Password Security
+
+The system implements industry-standard password security measures. All passwords are hashed using bcrypt algorithm with 12 salt rounds before storage, making them computationally expensive to crack. Passwords are never stored in plain text in the database. The system enforces minimum password requirements: at least 8 characters in length. Password fields are excluded from query results by default using Mongoose select: false to prevent accidental exposure. During authentication, passwords are compared using bcrypt's secure comparison function that is resistant to timing attacks. The password hashing occurs automatically before saving user records through Mongoose pre-save middleware.
+
+2. Two-Factor Authentication (OTP Verification)
+
+The system requires OTP (One-Time Password) verification for all login attempts, providing an additional security layer beyond passwords. When a user successfully enters correct credentials, the system generates a random 6-digit OTP code. This OTP is sent to the user's registered email address via Brevo email API. The OTP expires after 5 minutes to limit the window of opportunity for attackers. Users must enter the correct OTP to complete login and receive authentication tokens. The system implements rate limiting on OTP verification attempts (maximum 5 attempts per 5 minutes per IP address). Failed OTP attempts are logged for security monitoring. OTP codes are stored temporarily in the database with expiration timestamps and are automatically cleared after successful verification or expiration.
+
+3. JWT Token Authentication
+
+The system uses JSON Web Tokens for stateless authentication. Two types of tokens are issued: Access tokens (valid for 15 minutes) for API authentication and Refresh tokens (valid for 7 days) for obtaining new access tokens. Tokens contain encrypted user information including user ID, email, and role. Tokens are signed using a secret key (minimum 32 characters) stored securely in environment variables. Access tokens are short-lived to minimize damage if compromised. The system provides automatic token refresh mechanism when access tokens expire. Tokens are stored in HTTP-only cookies to prevent JavaScript access and XSS attacks. The cookie configuration includes secure flag (HTTPS only in production), sameSite: strict to prevent CSRF attacks, and appropriate expiration times. Token verification occurs on every protected API request through authentication middleware.
+
+4. Rate Limiting
+
+Comprehensive rate limiting protects against brute force attacks and denial of service. The system implements multiple rate limiters for different endpoints:
+
+General API Rate Limiter: 500 requests per 15 minutes per IP address for all API endpoints
+Authentication Rate Limiter: 50 requests per 15 minutes per IP address for login and registration
+OTP Verification Rate Limiter: 20 attempts per 5 minutes per IP address
+Order Creation Rate Limiter: 50 orders per 10 minutes per IP address
+Food Management Rate Limiter: 100 operations per 5 minutes per IP address for admin food operations
+File Upload Rate Limiter: 50 uploads per 10 minutes per IP address
+
+Rate limiters track requests by IP address and return 429 Too Many Requests status when limits are exceeded. Standard rate limit headers are included in responses to inform clients of their limits.
+
+5. Account Lockout Mechanism
+
+The system implements automatic account lockout to prevent brute force password attacks. Failed login attempts are tracked per user account. After 5 consecutive failed login attempts, the account is automatically locked for 5 minutes. During lockout period, login attempts are rejected with a clear message indicating remaining lockout time. The lockout counter resets automatically after the lockout period expires. Successful login resets the failed attempt counter to zero. Account lockout events are logged in the security log for monitoring. The system also tracks failed attempts per IP address and can automatically block IPs after 10 failed attempts across any accounts.
+
+6. IP Address Blocking
+
+Advanced IP blocking system provides protection against persistent attackers. Administrators can manually block suspicious IP addresses through the security dashboard. The system automatically blocks IP addresses after 10 failed login attempts within 15 minutes. Blocked IPs are stored in the database with reason, blocking admin, timestamp, and optional expiration time. IP blocking can be temporary (with expiration) or permanent. Blocked IP cache is maintained in memory for fast lookup without database queries. The cache refreshes every minute to stay synchronized with database. All requests from blocked IPs are rejected at the middleware level before reaching application logic. Blocked IP attempts are logged with timestamps for security analysis. Administrators can view all blocked IPs, filter by active status, and unblock IPs when necessary.
+
+7. Input Validation and Sanitization
+
+Comprehensive input validation prevents injection attacks and data corruption. The system uses Joi validation library for schema-based validation of all request bodies. Validation rules enforce data types, required fields, string lengths, email formats, and allowed values. Custom NoSQL injection prevention middleware sanitizes all request data by removing dangerous operators (dollar sign, dot notation) that could manipulate MongoDB queries. XSS (Cross-Site Scripting) prevention removes script tags, javascript: protocols, and event handler attributes from string inputs. Request body size is limited to 10KB to prevent denial of service through large payloads. Validation errors return detailed error messages with 400 Bad Request status. All validation occurs before data reaches business logic or database operations.
+
+8. CSRF Protection
+
+Cross-Site Request Forgery protection prevents unauthorized actions from malicious websites. The system generates unique CSRF tokens for each user session. CSRF tokens are stored server-side with session ID mapping and 1-hour expiration. Tokens are sent to clients via HTTP-only cookies. All state-changing requests (POST, PUT, DELETE) require valid CSRF token in X-CSRF-Token header. The middleware verifies token presence, validity, and expiration before processing requests. GET, HEAD, and OPTIONS requests bypass CSRF verification as they should not modify state. Invalid or missing CSRF tokens result in 403 Forbidden response. CSRF tokens are automatically cleaned up after expiration through periodic cleanup process.
+
+9. Security HTTP Headers (Helmet.js)
+
+The system uses Helmet.js middleware to set secure HTTP headers. Implemented headers include:
+
+Content-Security-Policy: Restricts resource loading to trusted sources, prevents inline script execution
+X-Content-Type-Options: nosniff - Prevents MIME type sniffing attacks
+X-Frame-Options: DENY - Prevents clickjacking by blocking iframe embedding
+X-XSS-Protection: 1; mode=block - Enables browser XSS filtering
+Strict-Transport-Security: Forces HTTPS connections for 1 year including subdomains
+Referrer-Policy: strict-origin-when-cross-origin - Controls referrer information leakage
+Permissions-Policy: Restricts access to browser features like geolocation, camera, microphone
+
+These headers provide defense-in-depth protection against various web vulnerabilities.
+
+10. CORS (Cross-Origin Resource Sharing)
+
+CORS configuration restricts which domains can access the API. The system allows requests only from the configured client URL (environment variable CLIENT_URL). Credentials (cookies, authorization headers) are allowed through credentials: true setting. Preflight requests are handled automatically. Unauthorized origins receive CORS errors preventing API access. This prevents malicious websites from making requests to the API on behalf of authenticated users.
+
+11. Activity Logging and Monitoring
+
+Comprehensive activity logging provides audit trail and security monitoring. The system logs all authentication events (login attempts, successful logins, logouts, OTP generation, OTP verification, account lockouts, registration). CRUD operations are logged with user, resource type, resource ID, and action. Security events are logged including suspicious activities, IP blocking/unblocking, unauthorized access attempts, and rate limit violations. Each log entry includes user ID, username, email, IP address, user agent, device type, browser, action description, action type (auth, crud, security, permission, system), status (success, failure, warning), HTTP method and endpoint, timestamp, error messages for failures, and additional metadata. Logs are stored in MongoDB with indexed fields for efficient querying. Automatic log cleanup deletes entries older than 90 days to manage storage. Administrators can view, filter, and search logs through the security dashboard. Log statistics provide overview of system activity and security trends.
+
+12. Real-time Security Monitoring Dashboard
+
+Administrators have access to a comprehensive security monitoring interface with three main sections:
+
+Security Statistics Tab: Displays overview metrics including total logs, success/failure/warning counts, breakdown by action type (auth, crud, security), recent activity timeline, top active users, and most frequent IP addresses. Statistics can be filtered by date range for trend analysis.
+
+Activity Logs Tab: Provides detailed searchable log viewer with filters for user, IP address, action type, status, and date range. Pagination for efficient browsing of large log sets. Each log entry shows complete details including timestamp, user, action, status, and metadata. Export functionality for compliance and analysis.
+
+IP Management Tab: Lists all blocked IP addresses with block reason, blocking admin, block timestamp, and expiration time. Administrators can manually block new IPs with reason and optional duration. Unblock functionality for removing blocks. View access statistics per IP including request counts, success/failure rates, and risk level assessment. Automatic blocking indicators show system-generated blocks vs manual blocks.
+
+13. Google reCAPTCHA Integration
+
+The system integrates Google reCAPTCHA v2 to prevent automated bot attacks. reCAPTCHA verification is required for user registration to prevent mass account creation by bots. The backend verifies reCAPTCHA tokens with Google's API before processing registration. Failed reCAPTCHA verification is logged as suspicious activity. The system uses reCAPTCHA secret key stored securely in environment variables. This protection prevents automated attacks while maintaining good user experience for legitimate users.
+
+14. File Upload Security
+
+File upload functionality includes multiple security measures. Multer middleware handles multipart form data securely. File size is limited to 5MB maximum to prevent storage exhaustion. Allowed file types are restricted to images (JPEG, PNG, GIF, WebP) for food items and user profiles. Files are stored with unique generated filenames to prevent overwrites and path traversal. Upload directory is outside web root with controlled access. File upload endpoints have dedicated rate limiting (50 uploads per 10 minutes). Uploaded files are served with appropriate CORS headers. File validation occurs before saving to disk.
+
+15. Environment Variable Protection
+
+All sensitive configuration is stored in environment variables, never in code. Protected variables include database connection strings, API keys (Brevo email, reCAPTCHA), JWT secret keys, client URL, and port configuration. The .env file is excluded from version control via .gitignore. An .env.example file provides template without sensitive values. The system validates required environment variables on startup. Production deployments use platform-specific secure environment variable management.
+
+16. Database Security
+
+MongoDB security measures include connection string encryption in environment variables, Mongoose schema validation for data integrity, automatic sanitization of query parameters to prevent NoSQL injection, indexed fields for efficient querying without exposing full collections, and password fields excluded from queries by default. The database connection uses authentication and is restricted to authorized IP addresses in production.
+
+17. Session Management
+
+Secure session management prevents session hijacking and fixation. Sessions are identified by secure random session IDs. Session data is stored server-side with client receiving only session ID. HTTP-only cookies prevent JavaScript access to session tokens. Secure flag ensures cookies only transmitted over HTTPS in production. SameSite: strict prevents CSRF attacks. Automatic session expiration after inactivity period. Session cleanup removes expired sessions periodically.
+
+18. Error Handling
+
+Secure error handling prevents information leakage. Generic error messages are returned to clients without exposing internal details. Detailed error information is logged server-side for debugging. Stack traces are never sent to clients in production. Database errors are caught and sanitized before response. Authentication errors use generic messages to prevent user enumeration. Rate limit errors include retry-after information. Validation errors provide field-specific feedback without exposing system internals.
+
+19. Logging Infrastructure
+
+Winston logging library provides structured logging. Multiple log files separate concerns: error.log for errors only, combined.log for all log levels, security.log for security events, and access.log for HTTP requests. Log rotation prevents unlimited file growth (5MB max per file, 5-10 files retained). Console logging in development for debugging. JSON format for machine parsing and analysis. Log levels (error, warn, info, debug) control verbosity. Timestamps on all log entries. Logs stored outside web root for security.
+
+20. Apache Security Rules (.htaccess)
+
+Additional server-level security through Apache configuration includes disabled directory listing to prevent file enumeration, protection of sensitive files (.env, .htaccess, .ini, .log, .sh, .sql, .conf), blocked access to node_modules directory, SQL injection pattern blocking in query strings, file injection attempt blocking, XSS attempt blocking, limited HTTP methods to GET, POST, PUT, DELETE, OPTIONS only, and security headers as backup to Helmet.js.
+
+
+DATA SECURITY AND CLASSIFICATION
+
+The system handles various types of sensitive data with appropriate protection measures:
+
+Type of Data: User Authentication Credentials
+Description: Email addresses, hashed passwords, OTP codes, JWT tokens, session identifiers
+Security Measure Applied: Bcrypt password hashing with 12 salt rounds, OTP expiration after 5 minutes, JWT token encryption and signing, HTTP-only secure cookies, Automatic token expiration and refresh, Password fields excluded from queries, Rate limiting on authentication attempts
+
+Type of Data: Personal Information
+Description: User names, email addresses, phone numbers, delivery addresses, profile images
+Security Measure Applied: Input validation and sanitization, Access control (users can only view own data), Encrypted database connections, Role-based access restrictions, Activity logging for all access, XSS protection on all inputs
+
+Type of Data: Order Information
+Description: Order details, items ordered, quantities, prices, delivery addresses, order status, timestamps
+Security Measure Applied: User isolation (customers see only own orders), Admin-only access to all orders, Order ID generation using secure random, Activity logging for all order operations, Input validation on all order data, Status change authorization checks
+
+Type of Data: Payment Information
+Description: Order totals, transaction records (Note: No credit card data stored)
+Security Measure Applied: Cash on delivery only (no card processing), Order total validation, Transaction logging, Access restricted to order owner and admin
+
+Type of Data: Location Data
+Description: Delivery addresses, rider real-time location coordinates, delivery routes
+Security Measure Applied: Access restricted to relevant rider and admin, Real-time data transmitted over secure WebSocket, Location updates require authentication, Automatic cleanup of old location data, Encrypted transmission
+
+Type of Data: System Logs
+Description: Activity logs, security logs, access logs, error logs, audit trails
+Security Measure Applied: Admin-only access, Automatic log rotation and cleanup, Logs stored outside web root, Sensitive data redacted from logs, Indexed for efficient querying, 90-day retention policy
+
+Type of Data: Chat Messages
+Description: Customer support conversations, message content, timestamps, participants
+Security Measure Applied: Access restricted to conversation participants and admin, Real-time encryption during transmission, Message validation and sanitization, Activity logging for chat access, Stored in secure database
+
+Type of Data: Administrative Data
+Description: User roles, permissions, IP blocks, security settings, system configuration
+Security Measure Applied: Admin-only access with full authentication, All changes logged with admin identity, Critical operations require valid session, Configuration stored in environment variables, Database-level access controls
+
+Confidential Data Protection:
+All data classified as confidential (passwords, tokens, personal information) is protected through multiple layers: encryption in transit using HTTPS/TLS, encryption at rest in MongoDB, access control through authentication and authorization, activity logging for audit trails, input validation to prevent injection, output encoding to prevent XSS, secure session management, and regular security monitoring.
+
+
+SYSTEM LOGS AND MONITORING
+
+The system implements comprehensive logging across multiple categories:
+
+Authentication Logs:
+User login attempts (successful and failed) with email, IP address, timestamp, and failure reason
+User logout events with session duration
+User registration with email and IP address
+OTP generation and sending with recipient email
+OTP verification attempts (successful and failed)
+Account lockout events with reason and duration
+Token refresh operations
+Session expiration events
+
+Activity Tracking:
+All CRUD operations (Create, Read, Update, Delete) with user identity, resource type, resource ID, action performed, timestamp, and status
+Food item management (create, update, delete) by admin
+Order creation, status updates, and cancellations
+User profile updates
+Rider assignment and status changes
+Chat message sending and reading
+File uploads with file details
+
+Admin Monitoring:
+Admin dashboard access
+User role changes with old and new roles
+IP blocking and unblocking operations
+Security setting modifications
+System configuration changes
+Log viewing and filtering operations
+Analytics and report generation
+
+Security Event Logging:
+Failed authentication attempts with details
+Suspicious activity detection (unusual patterns, rapid requests, invalid tokens)
+Rate limit violations with IP and endpoint
+CSRF token validation failures
+Input validation failures
+Unauthorized access attempts to protected resources
+IP blocking triggers (manual and automatic)
+Session hijacking attempts
+
+System Logs:
+Application startup and shutdown
+Database connection status
+Error logs with stack traces (server-side only)
+HTTP request logs (method, endpoint, status code, response time, IP address)
+WebSocket connection and disconnection events
+Email sending status (success/failure)
+File system operations
+
+Purpose of Logging:
+Logs serve multiple critical purposes. They provide security monitoring to detect and respond to attacks, unauthorized access, and suspicious patterns. They create audit trails for compliance and accountability, showing who did what and when. They enable incident response by providing detailed information for investigating security breaches. They support troubleshooting by capturing errors and system behavior. They facilitate performance monitoring by tracking response times and resource usage. They enable trend analysis to identify patterns and optimize security measures.
+
+Log Access and Retention:
+Only administrators can access system logs through the security dashboard. Logs are stored in MongoDB with indexed fields for efficient querying. The system retains logs for 90 days before automatic deletion. Critical security logs may be archived for longer periods. Log files are stored outside the web root directory for security. Access to log files requires server-level authentication. Log viewing is itself logged for accountability.
+
+
+ENCRYPTION POLICY
+
+The system implements encryption at multiple layers to protect data confidentiality and integrity:
+
+Password Encryption:
+Method: Bcrypt hashing algorithm with 12 salt rounds
+Implementation: Automatic hashing before saving user records through Mongoose pre-save middleware
+Key Management: Salt generated automatically per password by bcrypt
+Strength: Computationally expensive to crack, resistant to rainbow table attacks
+Verification: Secure comparison function resistant to timing attacks
+Storage: Only hashed passwords stored in database, never plain text
+
+JWT Token Encryption:
+Method: HMAC SHA256 signing algorithm
+Implementation: Tokens signed with secret key, containing encrypted user payload
+Key Management: Secret key stored in environment variables, minimum 32 characters
+Token Structure: Header (algorithm), Payload (user data), Signature (verification)
+Expiration: Access tokens 15 minutes, Refresh tokens 7 days
+Verification: Signature verified on every request to ensure token integrity
+
+Data in Transit:
+Method: TLS/HTTPS encryption for all client-server communication
+Implementation: HTTPS enforced in production through Strict-Transport-Security header
+Protocol: TLS 1.2 or higher
+Coverage: All API requests, WebSocket connections, file uploads, authentication flows
+Certificate: SSL/TLS certificate from trusted certificate authority
+
+Data at Rest:
+Method: MongoDB encryption at rest (when enabled on MongoDB Atlas)
+Implementation: Database-level encryption of stored data
+Key Management: Managed by MongoDB Atlas with automatic key rotation
+Coverage: All database collections including users, orders, logs, messages
+Additional: Sensitive fields like passwords additionally hashed before storage
+
+Session Data Encryption:
+Method: Encrypted session identifiers in HTTP-only cookies
+Implementation: Secure random session ID generation using crypto module
+Storage: Session data stored server-side, only ID sent to client
+Protection: HTTP-only, Secure, SameSite flags prevent access and transmission attacks
+
+OTP Encryption:
+Method: Temporary storage with automatic expiration
+Implementation: OTP stored in database with 5-minute expiration timestamp
+Transmission: Sent via encrypted email through Brevo API over HTTPS
+Cleanup: Automatically removed after verification or expiration
+
+File Upload Encryption:
+Method: Files stored with unique generated names to prevent enumeration
+Implementation: Multer generates secure random filenames
+Storage: Files stored in protected directory with controlled access
+Transmission: Uploaded over HTTPS, served with appropriate security headers
+
+Environment Variables:
+Method: Stored outside application code in .env file
+Implementation: Loaded at runtime, never committed to version control
+Protection: File permissions restrict access to authorized users only
+Production: Platform-specific secure environment variable storage
+
+WebSocket Communication:
+Method: Encrypted WebSocket connections (WSS protocol)
+Implementation: Socket.IO over HTTPS connection
+Coverage: Real-time chat messages, order updates, location tracking
+Authentication: JWT token required for WebSocket connection
+
+
+DATA BACKUP AND RECOVERY
+
+The system implements data protection through backup and recovery procedures:
+
+Data Backed Up:
+Complete MongoDB database including all collections: users, orders, foods, activity logs, blocked IPs, chat messages, and system configuration. User-uploaded files in the uploads directory including food images and profile pictures. Environment configuration templates (not actual .env files with secrets). Application logs for the retention period.
+
+Backup Method:
+Database: MongoDB Atlas automated backups (if using Atlas) with continuous backup and point-in-time recovery. Manual backup option using mongodump utility for local database instances. Backup includes all collections with indexes and relationships preserved.
+
+File System: Manual or automated file system backup of uploads directory. Incremental backup to capture only changed files. Backup stored separately from application server.
+
+Backup Frequency:
+Database: Continuous backup with MongoDB Atlas (automatic). Daily snapshots retained for 7 days. Weekly snapshots retained for 4 weeks. Monthly snapshots retained for 12 months.
+
+File System: Daily backup of uploads directory. Incremental backup every 6 hours for active systems.
+
+Application Logs: Rotated and archived daily. Retained for 90 days before deletion.
+
+Backup Storage:
+Database backups stored in MongoDB Atlas cloud infrastructure with geographic redundancy. File backups stored on separate server or cloud storage service. Backup encryption at rest and in transit. Access to backups restricted to authorized administrators only. Backup integrity verified through regular testing.
+
+Recovery Procedures:
+Database Recovery: Point-in-time recovery available through MongoDB Atlas. Restore from specific snapshot for data corruption or loss. Full database restore or selective collection restore. Recovery time objective (RTO): 1-4 hours depending on database size. Recovery point objective (RPO): Up to 24 hours of data loss possible.
+
+File Recovery: Restore uploads directory from latest backup. Selective file restoration for specific items. Verification of file integrity after restoration.
+
+Disaster Recovery: Complete system restoration from backups. Application redeployment from version control. Environment reconfiguration from templates. Database restoration from latest snapshot. File system restoration from backup. Testing and verification before production use.
+
+Backup Testing:
+Regular backup restoration tests (monthly recommended). Verification of backup integrity and completeness. Documentation of recovery procedures. Training for administrators on recovery process.
+
+
+LIMITATIONS OF THE SYSTEM SECURITY
+
+While the system implements comprehensive security measures, certain limitations exist:
+
+No Two-Factor Authentication App Support:
+The system uses email-based OTP for two-factor authentication. It does not support authenticator apps like Google Authenticator or hardware tokens. Email-based OTP is less secure than app-based TOTP as email accounts can be compromised. Users cannot choose their preferred 2FA method.
+
+No End-to-End Encryption for Chat:
+Chat messages are encrypted in transit (HTTPS) and at rest (database encryption) but not end-to-end encrypted. Administrators can view all chat conversations. Messages are stored in plain text in the database (though database is encrypted). No perfect forward secrecy for chat history.
+
+Limited Password Complexity Requirements:
+The system only enforces minimum 8-character password length. No requirements for uppercase, lowercase, numbers, or special characters. No password strength meter or suggestions. Users can set weak passwords that meet minimum length. No password history to prevent reuse.
+
+No Biometric Authentication:
+The system does not support fingerprint, face recognition, or other biometric authentication methods. Authentication relies solely on password and email OTP. No device-based authentication or trusted device management.
+
+Cash-Only Payment System:
+The system only supports cash on delivery payment. No integration with secure payment gateways for card or digital wallet payments. Cannot leverage payment gateway security features. Limited payment audit trail compared to electronic payments.
+
+Single Database Instance:
+The system uses a single MongoDB instance (or cluster). No real-time database replication to separate geographic locations. Database failure could cause extended downtime. Recovery depends on backup restoration rather than automatic failover.
+
+Limited DDoS Protection:
+Rate limiting provides basic protection against denial of service. No advanced DDoS mitigation like traffic analysis, IP reputation, or challenge-response. Large-scale coordinated attacks could overwhelm rate limiters. Depends on hosting provider's DDoS protection.
+
+No Security Audit Trail Export:
+Activity logs can be viewed in dashboard but no automated export to SIEM systems. No integration with external security monitoring tools. Manual log analysis required for advanced threat detection. No automated alerting for security events.
+
+No Data Loss Prevention:
+No mechanisms to prevent authorized users from exfiltrating data. Administrators have full access to all data without additional controls. No watermarking or tracking of sensitive data access. No automated detection of unusual data access patterns.
+
+No Penetration Testing:
+The system has not undergone professional penetration testing. Vulnerabilities may exist that are not discovered through code review. No formal security assessment or certification. Security measures based on best practices but not independently verified.
+
+Session Management Limitations:
+No concurrent session limits per user. No remote session termination capability. No session activity monitoring or suspicious session detection. Users cannot view or manage their active sessions.
+
+Limited Audit Capabilities:
+90-day log retention may be insufficient for some compliance requirements. No immutable audit log to prevent tampering. No cryptographic proof of log integrity. Limited log analysis and reporting capabilities.
+
+No Security Training:
+The system does not include security awareness training for users. No guidance on creating strong passwords or recognizing phishing. Users may not understand security features or their importance. No security best practices documentation for end users.
+
+Development Environment Security:
+Development and testing environments may have relaxed security settings. Sensitive data may exist in development databases. No formal separation between development and production security policies.
+
+
+SUMMARY OF SECURITY FEATURES
+
+The Polomolok Food Ordering System implements a comprehensive multi-layered security architecture to protect user data and system integrity. Core security features include bcrypt password hashing with 12 salt rounds, email-based OTP two-factor authentication with 5-minute expiration, JWT token-based authentication with automatic refresh, role-based access control for admin, customer, and rider roles, comprehensive rate limiting across all endpoints, automatic account lockout after 5 failed login attempts, IP address blocking with automatic and manual controls, input validation and sanitization to prevent injection attacks, CSRF protection for state-changing operations, security HTTP headers through Helmet.js, CORS restrictions to authorized origins only, comprehensive activity logging and monitoring, real-time security dashboard for administrators, Google reCAPTCHA integration for bot prevention, secure file upload handling with size and type restrictions, environment variable protection for sensitive configuration, MongoDB security with query sanitization, secure session management with HTTP-only cookies, structured error handling without information leakage, Winston logging infrastructure with rotation, Apache security rules through .htaccess, and data encryption in transit and at rest. The system provides defense-in-depth protection through multiple overlapping security controls, ensuring that compromise of one layer does not compromise the entire system. All security events are logged for audit and incident response purposes, and administrators have comprehensive tools for monitoring and managing system security.

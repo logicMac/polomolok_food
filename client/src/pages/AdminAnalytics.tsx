@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
-import { TrendingUp, DollarSign, ShoppingCart, Users, Package, AlertTriangle } from 'lucide-react';
+import { TrendingUp, DollarSign, ShoppingCart, Users, Package, AlertTriangle, BarChart as BarChartIcon } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 interface AnalyticsData {
@@ -74,10 +74,41 @@ const AdminAnalytics = () => {
         api.get(`/analytics/dashboard?period=${period}`),
         api.get('/analytics/inventory')
       ]);
-      setAnalytics(analyticsRes.data.data);
-      setInventory(inventoryRes.data.data);
+      
+      // Handle empty or missing data with defaults
+      const analyticsData = analyticsRes.data.data || {
+        revenue: { total: 0, orderCount: 0, average: 0 },
+        ordersByStatus: [],
+        topFoods: [],
+        revenueByDay: [],
+        peakHours: [],
+        customers: { total: 0, new: 0 }
+      };
+      
+      const inventoryData = inventoryRes.data.data || {
+        lowStockItems: [],
+        outOfStockItems: [],
+        stockByCategory: []
+      };
+      
+      setAnalytics(analyticsData);
+      setInventory(inventoryData);
     } catch (error) {
       console.error('Failed to fetch analytics:', error);
+      // Set default empty data on error
+      setAnalytics({
+        revenue: { total: 0, orderCount: 0, average: 0 },
+        ordersByStatus: [],
+        topFoods: [],
+        revenueByDay: [],
+        peakHours: [],
+        customers: { total: 0, new: 0 }
+      });
+      setInventory({
+        lowStockItems: [],
+        outOfStockItems: [],
+        stockByCategory: []
+      });
     } finally {
       setLoading(false);
     }
@@ -189,167 +220,201 @@ const AdminAnalytics = () => {
               </div>
             </div>
 
-            {/* Orders by Status */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 mb-8">
-              <h2 className="text-xl font-bold text-white mb-6">Orders by Status</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Pie Chart */}
-                <div className="flex items-center justify-center">
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={analytics.ordersByStatus.map(status => ({
-                          name: status._id.charAt(0).toUpperCase() + status._id.slice(1),
-                          value: status.count
-                        }))}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={100}
-                        paddingAngle={2}
-                        dataKey="value"
-                      >
-                        {analytics.ordersByStatus.map((_, index) => {
-                          const colors = ['#ffffff', '#d4d4d8', '#a1a1aa', '#71717a', '#52525b', '#3f3f46'];
-                          return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />;
-                        })}
-                      </Pie>
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: '#18181b', 
-                          border: '1px solid #3f3f46',
-                          borderRadius: '8px',
-                          color: '#ffffff'
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                
-                {/* Legend */}
-                <div className="flex flex-col justify-center space-y-3">
-                  {analytics.ordersByStatus.map((status, index) => {
-                    const colors = ['#ffffff', '#d4d4d8', '#a1a1aa', '#71717a', '#52525b', '#3f3f46'];
-                    const total = analytics.ordersByStatus.reduce((sum, s) => sum + s.count, 0);
-                    const percentage = ((status.count / total) * 100).toFixed(1);
-                    
-                    return (
-                      <div key={status._id} className="flex items-center justify-between p-3 bg-black rounded-lg border border-zinc-800">
-                        <div className="flex items-center gap-3">
-                          <div
-                            className="w-4 h-4 rounded"
-                            style={{ backgroundColor: colors[index % colors.length] }}
-                          ></div>
-                          <span className="text-white capitalize">{status._id}</span>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-white font-semibold">{status.count}</div>
-                          <div className="text-xs text-gray-400">{percentage}%</div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Revenue Trend Bar Chart */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 mb-8">
-              <h2 className="text-xl font-bold text-white mb-6">Revenue Trend</h2>
-              <ResponsiveContainer width="100%" height={350}>
-                <BarChart
-                  data={analytics.revenueByDay.map(day => ({
-                    date: new Date(day._id).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                    revenue: day.revenue,
-                    orders: day.orders
-                  }))}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" />
-                  <XAxis 
-                    dataKey="date" 
-                    stroke="#a1a1aa"
-                    style={{ fontSize: '12px' }}
-                  />
-                  <YAxis 
-                    stroke="#a1a1aa"
-                    style={{ fontSize: '12px' }}
-                  />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#18181b', 
-                      border: '1px solid #3f3f46',
-                      borderRadius: '8px',
-                      color: '#ffffff'
-                    }}
-                    formatter={(value: any, name: any) => {
-                      if (name === 'revenue') return [`₱${value.toFixed(2)}`, 'Revenue'];
-                      return [value, 'Orders'];
-                    }}
-                  />
-                  <Bar dataKey="revenue" fill="#ffffff" radius={[8, 8, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Top Selling Foods */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 mb-8">
-              <h2 className="text-xl font-bold text-white mb-4">Top Selling Foods</h2>
-              <div className="space-y-3">
-                {analytics.topFoods.map((food, index) => (
-                  <div key={food._id} className="flex items-center gap-4 p-3 bg-black rounded-lg border border-zinc-800">
-                    <span className="text-xl font-bold text-gray-600 w-6">#{index + 1}</span>
-                    <img
-                      src={getImageUrl(food.image)}
-                      alt={food.name}
-                      className="w-12 h-12 object-cover rounded"
-                      onError={(e) => {
-                        e.currentTarget.src = 'https://via.placeholder.com/48?text=No+Image';
-                      }}
-                    />
-                    <div className="flex-1">
-                      <p className="font-semibold text-white">{food.name}</p>
-                      <p className="text-xs text-gray-400">{food.totalQuantity} sold</p>
-                    </div>
-                    <p className="font-bold text-white">₱{food.totalRevenue.toFixed(2)}</p>
+            {/* No Data Message */}
+            {analytics.revenue.orderCount === 0 ? (
+              <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-16 text-center">
+                <BarChartIcon className="w-20 h-20 text-gray-700 mx-auto mb-6" />
+                <h3 className="text-2xl font-bold text-white mb-3">No Analytics Data Yet</h3>
+                <p className="text-gray-400 mb-2">There are no orders in the selected period.</p>
+                <p className="text-sm text-gray-500">Once customers start placing orders, you'll see detailed analytics here including:</p>
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                  <div className="bg-black border border-zinc-800 rounded-lg p-4">
+                    <p className="text-white font-medium mb-1">Revenue Trends</p>
+                    <p className="text-xs text-gray-500">Daily revenue charts</p>
                   </div>
-                ))}
+                  <div className="bg-black border border-zinc-800 rounded-lg p-4">
+                    <p className="text-white font-medium mb-1">Order Status</p>
+                    <p className="text-xs text-gray-500">Status breakdown</p>
+                  </div>
+                  <div className="bg-black border border-zinc-800 rounded-lg p-4">
+                    <p className="text-white font-medium mb-1">Top Products</p>
+                    <p className="text-xs text-gray-500">Best sellers</p>
+                  </div>
+                </div>
               </div>
-            </div>
+            ) : (
+              <>
+                {/* Orders by Status */}
+                {analytics.ordersByStatus.length > 0 && (
+                  <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 mb-8">
+                    <h2 className="text-xl font-bold text-white mb-6">Orders by Status</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      {/* Pie Chart */}
+                      <div className="flex items-center justify-center">
+                        <ResponsiveContainer width="100%" height={300}>
+                          <PieChart>
+                            <Pie
+                              data={analytics.ordersByStatus.map(status => ({
+                                name: status._id.charAt(0).toUpperCase() + status._id.slice(1),
+                                value: status.count
+                              }))}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={60}
+                              outerRadius={100}
+                              paddingAngle={2}
+                              dataKey="value"
+                            >
+                              {analytics.ordersByStatus.map((_, index) => {
+                                const colors = ['#ffffff', '#d4d4d8', '#a1a1aa', '#71717a', '#52525b', '#3f3f46'];
+                                return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />;
+                              })}
+                            </Pie>
+                            <Tooltip 
+                              contentStyle={{ 
+                                backgroundColor: '#18181b', 
+                                border: '1px solid #3f3f46',
+                                borderRadius: '8px',
+                                color: '#ffffff'
+                              }}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      
+                      {/* Legend */}
+                      <div className="flex flex-col justify-center space-y-3">
+                        {analytics.ordersByStatus.map((status, index) => {
+                          const colors = ['#ffffff', '#d4d4d8', '#a1a1aa', '#71717a', '#52525b', '#3f3f46'];
+                          const total = analytics.ordersByStatus.reduce((sum, s) => sum + s.count, 0);
+                          const percentage = ((status.count / total) * 100).toFixed(1);
+                          
+                          return (
+                            <div key={status._id} className="flex items-center justify-between p-3 bg-black rounded-lg border border-zinc-800">
+                              <div className="flex items-center gap-3">
+                                <div
+                                  className="w-4 h-4 rounded"
+                                  style={{ backgroundColor: colors[index % colors.length] }}
+                                ></div>
+                                <span className="text-white capitalize">{status._id}</span>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-white font-semibold">{status.count}</div>
+                                <div className="text-xs text-gray-400">{percentage}%</div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-            {/* Peak Hours */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
-              <h2 className="text-xl font-bold text-white mb-6">Peak Hours</h2>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart
-                  data={analytics.peakHours.map(hour => ({
-                    hour: `${hour._id}:00`,
-                    orders: hour.count
-                  }))}
-                  layout="vertical"
-                  margin={{ top: 5, right: 30, left: 60, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" />
-                  <XAxis type="number" stroke="#a1a1aa" style={{ fontSize: '12px' }} />
-                  <YAxis 
-                    type="category" 
-                    dataKey="hour" 
-                    stroke="#a1a1aa"
-                    style={{ fontSize: '12px' }}
-                  />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#18181b', 
-                      border: '1px solid #3f3f46',
-                      borderRadius: '8px',
-                      color: '#ffffff'
-                    }}
-                    formatter={(value: any) => [`${value} orders`, 'Orders']}
-                  />
-                  <Bar dataKey="orders" fill="#ffffff" radius={[0, 8, 8, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+                {/* Revenue Trend Bar Chart */}
+                {analytics.revenueByDay.length > 0 && (
+                  <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 mb-8">
+                    <h2 className="text-xl font-bold text-white mb-6">Revenue Trend</h2>
+                    <ResponsiveContainer width="100%" height={350}>
+                      <BarChart
+                        data={analytics.revenueByDay.map(day => ({
+                          date: new Date(day._id).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                          revenue: day.revenue,
+                          orders: day.orders
+                        }))}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" />
+                        <XAxis 
+                          dataKey="date" 
+                          stroke="#a1a1aa"
+                          style={{ fontSize: '12px' }}
+                        />
+                        <YAxis 
+                          stroke="#a1a1aa"
+                          style={{ fontSize: '12px' }}
+                        />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: '#18181b', 
+                            border: '1px solid #3f3f46',
+                            borderRadius: '8px',
+                            color: '#ffffff'
+                          }}
+                          formatter={(value: any, name: any) => {
+                            if (name === 'revenue') return [`₱${value.toFixed(2)}`, 'Revenue'];
+                            return [value, 'Orders'];
+                          }}
+                        />
+                        <Bar dataKey="revenue" fill="#ffffff" radius={[8, 8, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+
+                {/* Top Selling Foods */}
+                {analytics.topFoods.length > 0 && (
+                  <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 mb-8">
+                    <h2 className="text-xl font-bold text-white mb-4">Top Selling Foods</h2>
+                    <div className="space-y-3">
+                      {analytics.topFoods.map((food, index) => (
+                        <div key={food._id} className="flex items-center gap-4 p-3 bg-black rounded-lg border border-zinc-800">
+                          <span className="text-xl font-bold text-gray-600 w-6">#{index + 1}</span>
+                          <img
+                            src={getImageUrl(food.image)}
+                            alt={food.name}
+                            className="w-12 h-12 object-cover rounded"
+                            onError={(e) => {
+                              e.currentTarget.src = 'https://via.placeholder.com/48?text=No+Image';
+                            }}
+                          />
+                          <div className="flex-1">
+                            <p className="font-semibold text-white">{food.name}</p>
+                            <p className="text-xs text-gray-400">{food.totalQuantity} sold</p>
+                          </div>
+                          <p className="font-bold text-white">₱{food.totalRevenue.toFixed(2)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Peak Hours */}
+                {analytics.peakHours.length > 0 && (
+                  <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
+                    <h2 className="text-xl font-bold text-white mb-6">Peak Hours</h2>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart
+                        data={analytics.peakHours.map(hour => ({
+                          hour: `${hour._id}:00`,
+                          orders: hour.count
+                        }))}
+                        layout="vertical"
+                        margin={{ top: 5, right: 30, left: 60, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" />
+                        <XAxis type="number" stroke="#a1a1aa" style={{ fontSize: '12px' }} />
+                        <YAxis 
+                          type="category" 
+                          dataKey="hour" 
+                          stroke="#a1a1aa"
+                          style={{ fontSize: '12px' }}
+                        />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: '#18181b', 
+                            border: '1px solid #3f3f46',
+                            borderRadius: '8px',
+                            color: '#ffffff'
+                          }}
+                          formatter={(value: any) => [`${value} orders`, 'Orders']}
+                        />
+                        <Bar dataKey="orders" fill="#ffffff" radius={[0, 8, 8, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </>
+            )}
           </>
         )}
 

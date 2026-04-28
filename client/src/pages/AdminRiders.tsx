@@ -308,125 +308,224 @@ const AdminRiders = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
+                {/* Image Upload Section */}
                 <div>
                   <label className="block text-sm font-semibold text-white mb-3">Profile Image</label>
-                  <div className="flex items-center gap-4">
-                    {imagePreview ? (
-                      <img
-                        src={imagePreview}
-                        alt="Preview"
-                        className="w-20 h-20 rounded-full object-cover border-2 border-zinc-700"
-                      />
-                    ) : (
-                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
-                        <Bike className="w-10 h-10 text-white" />
+                  <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <div className="relative group">
+                      {imagePreview ? (
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="w-24 h-24 rounded-full object-cover border-2 border-zinc-700 group-hover:border-white transition"
+                        />
+                      ) : (
+                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Bike className="w-12 h-12 text-white" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
                       </div>
-                    )}
+                    </div>
+                    <div className="flex-1 w-full">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        id="rider-image"
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="rider-image"
+                        className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-black border border-zinc-800 rounded-xl text-white hover:border-white hover:bg-zinc-900 transition cursor-pointer"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Choose Image
+                      </label>
+                      <p className="text-xs text-gray-500 mt-2 text-center">JPG, PNG or GIF (max 5MB)</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Name Field */}
+                <div>
+                  <label className="block text-sm font-semibold text-white mb-2">
+                    Full Name <span className="text-red-400">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
                     <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="flex-1 px-3 py-2 bg-black border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white file:text-black hover:file:bg-gray-200 file:cursor-pointer"
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full pl-12 pr-4 py-3 bg-black border border-zinc-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                      placeholder="John Doe"
+                      required
                     />
                   </div>
                 </div>
 
+                {/* Email Field */}
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-2">Name *</label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white transition"
-                    placeholder="John Doe"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-white mb-2">Email *</label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white transition disabled:opacity-50"
-                    placeholder="rider@example.com"
-                    required
-                    disabled={!!editingRider}
-                  />
+                  <label className="block text-sm font-semibold text-white mb-2">
+                    Email Address <span className="text-red-400">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full pl-12 pr-4 py-3 bg-black border border-zinc-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      placeholder="rider@example.com"
+                      required
+                      disabled={!!editingRider}
+                    />
+                  </div>
                   {editingRider && (
-                    <p className="text-xs text-gray-500 mt-1.5">Email cannot be changed</p>
+                    <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      Email cannot be changed
+                    </p>
                   )}
                 </div>
 
+                {/* Password Field (only for new riders) */}
                 {!editingRider && (
                   <div>
-                    <label className="block text-sm font-semibold text-white mb-2">Password *</label>
-                    <input
-                      type="password"
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white transition"
-                      placeholder="••••••••"
-                      required={!editingRider}
-                      minLength={8}
-                    />
-                    <p className="text-xs text-gray-500 mt-1.5">Minimum 8 characters</p>
+                    <label className="block text-sm font-semibold text-white mb-2">
+                      Password <span className="text-red-400">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      </div>
+                      <input
+                        type="password"
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        className="w-full pl-12 pr-4 py-3 bg-black border border-zinc-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                        placeholder="••••••••"
+                        required={!editingRider}
+                        minLength={8}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Minimum 8 characters
+                    </p>
                   </div>
                 )}
 
+                {/* Phone Number Field */}
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-2">Phone Number *</label>
-                  <input
-                    type="tel"
-                    value={formData.phoneNumber}
-                    onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white transition"
-                    placeholder="09123456789"
-                    required
-                  />
+                  <label className="block text-sm font-semibold text-white mb-2">
+                    Phone Number <span className="text-red-400">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="tel"
+                      value={formData.phoneNumber}
+                      onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                      className="w-full pl-12 pr-4 py-3 bg-black border border-zinc-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition"
+                      placeholder="09123456789"
+                      required
+                    />
+                  </div>
                 </div>
 
+                {/* Vehicle Type Field */}
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-2">Vehicle Type *</label>
-                  <select
-                    value={formData.vehicleType}
-                    onChange={(e) => setFormData({ ...formData, vehicleType: e.target.value as any })}
-                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white transition"
-                    required
-                  >
-                    <option value="motorcycle">Motorcycle</option>
-                    <option value="bicycle">Bicycle</option>
-                    <option value="car">Car</option>
-                    <option value="scooter">Scooter</option>
-                  </select>
+                  <label className="block text-sm font-semibold text-white mb-2">
+                    Vehicle Type <span className="text-red-400">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <Bike className="w-5 h-5 text-gray-500" />
+                    </div>
+                    <select
+                      value={formData.vehicleType}
+                      onChange={(e) => setFormData({ ...formData, vehicleType: e.target.value as any })}
+                      className="w-full pl-12 pr-4 py-3 bg-black border border-zinc-800 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition appearance-none cursor-pointer"
+                      required
+                    >
+                      <option value="motorcycle">🏍️ Motorcycle</option>
+                      <option value="bicycle">🚲 Bicycle</option>
+                      <option value="car">🚗 Car</option>
+                      <option value="scooter">🛵 Scooter</option>
+                    </select>
+                    <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
 
+                {/* Vehicle Number Field */}
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-2">Vehicle Number *</label>
-                  <input
-                    type="text"
-                    value={formData.vehicleNumber}
-                    onChange={(e) => setFormData({ ...formData, vehicleNumber: e.target.value })}
-                    className="w-full px-4 py-3 bg-black border border-zinc-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white transition"
-                    placeholder="ABC-1234"
-                    required
-                  />
+                  <label className="block text-sm font-semibold text-white mb-2">
+                    Plate Number <span className="text-red-400">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      value={formData.vehicleNumber}
+                      onChange={(e) => setFormData({ ...formData, vehicleNumber: e.target.value.toUpperCase() })}
+                      className="w-full pl-12 pr-4 py-3 bg-black border border-zinc-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition uppercase"
+                      placeholder="ABC-1234"
+                      required
+                    />
+                  </div>
                 </div>
 
+                {/* Action Buttons */}
                 <div className="grid grid-cols-2 gap-3 pt-4">
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="px-4 py-3 bg-black text-white border border-zinc-800 rounded-xl hover:bg-zinc-900 hover:border-white transition font-medium"
+                    className="px-4 py-3 bg-black text-white border border-zinc-800 rounded-xl hover:bg-zinc-900 hover:border-white transition-all font-medium"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-3 bg-white text-black rounded-xl hover:bg-gray-200 transition-all hover:scale-105 active:scale-95 font-bold shadow-lg"
+                    className="relative px-4 py-3 bg-gradient-to-r from-white to-gray-100 text-black rounded-xl hover:from-gray-100 hover:to-white transition-all hover:scale-105 active:scale-95 font-bold shadow-lg overflow-hidden group"
                   >
-                    {editingRider ? 'Update' : 'Create'}
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-red-500/0 to-orange-500/0 group-hover:from-orange-500/20 group-hover:via-red-500/20 group-hover:to-orange-500/20 transition-all duration-500"></div>
+                    <span className="relative">
+                      {editingRider ? '✓ Update Rider' : '+ Create Rider'}
+                    </span>
                   </button>
                 </div>
               </form>

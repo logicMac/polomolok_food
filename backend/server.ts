@@ -59,12 +59,12 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://unpkg.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:", "http:"],
       scriptSrc: ["'self'", "'unsafe-inline'", "https://www.google.com", "https://www.gstatic.com"],
       frameSrc: ["'self'", "https://www.google.com"],
-      connectSrc: ["'self'", "https://www.google.com"],
+      connectSrc: ["'self'", "https://www.google.com", "https://api.groq.com"],
     },
   },
   crossOriginEmbedderPolicy: false,
